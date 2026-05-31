@@ -1,0 +1,32 @@
+# EAS uploads only what the project needs — keep the archive small.
+# See: https://docs.expo.dev/build-reference/easignore/
+
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Local env (secrets stay off EAS; use EAS Secrets for production)
+.env
+.env.local
+.env.*.local
+
+# Native folders — EAS runs prebuild on the server
+android/
+ios/
+
+# Logs & editor
+*.log
+.vscode/
+.idea/
+.DS_Store
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Keys (never upload)
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision

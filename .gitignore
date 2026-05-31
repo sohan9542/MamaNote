@@ -1,0 +1,37 @@
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Typescript
+*.tsbuildinfo
+
+# Native
+ios/
+android/
+
+# Logs
+logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Expo
+expo-env.d.ts

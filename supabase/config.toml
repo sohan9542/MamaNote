@@ -1,0 +1,3 @@
+# Public read-only share endpoint — validated by share token, not JWT
+[functions.get-shared-activities]
+verify_jwt = false
