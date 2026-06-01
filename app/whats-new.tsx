@@ -15,7 +15,7 @@ export default function WhatsNewScreen() {
     <Screen scroll contentClassName="pb-10">
       <ScreenBackHeader
         title="What's new"
-        subtitle="Latest updates in Mamanote"
+        subtitle="Latest updates in MamaNote"
       />
 
       <View className="gap-5">
@@ -48,7 +48,7 @@ export default function WhatsNewScreen() {
       </View>
 
       <Text muted variant="caption" className="mt-8 text-center">
-        More updates coming soon. Thanks for being an early parent on Mamanote.
+        More updates coming soon. Thanks for being an early parent on MamaNote.
       </Text>
     </Screen>
   );

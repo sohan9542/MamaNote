@@ -30,9 +30,9 @@ export function ShareLinkCard({ url, filterLabel, entryCount, expiresLabel }: Pr
 
   const handleShare = async () => {
     await Share.share({
-      message: `View ${filterLabel.toLowerCase()} on Mamanote:\n${url}`,
+      message: `View ${filterLabel.toLowerCase()} on MamaNote:\n${url}`,
       url,
-      title: 'Mamanote activity log',
+      title: 'MamaNote activity log',
     });
   };
 

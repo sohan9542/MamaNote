@@ -42,7 +42,7 @@ function formatFeedback(message: string, userEmail?: string) {
 export async function openStoreListing() {
   const url = storeListingUrl();
   if (!url) {
-    throw new Error('Store rating will be available once Mamanote is published.');
+    throw new Error('Store rating will be available once MamaNote is published.');
   }
   await Linking.openURL(url);
 }
@@ -57,7 +57,7 @@ export async function sendFeedback(message: string, userEmail?: string) {
   const email = feedbackEmail();
 
   if (email) {
-    const subject = encodeURIComponent('Mamanote feedback');
+    const subject = encodeURIComponent('MamaNote feedback');
     const body = encodeURIComponent(payload);
     const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
     const canOpen = await Linking.canOpenURL(mailto);
@@ -70,7 +70,7 @@ export async function sendFeedback(message: string, userEmail?: string) {
 
   const copied = await copyToClipboard(payload);
   if (!copied) {
-    await Share.share({ message: payload, title: 'Mamanote feedback' });
+    await Share.share({ message: payload, title: 'MamaNote feedback' });
     return 'share' as const;
   }
   return 'clipboard' as const;

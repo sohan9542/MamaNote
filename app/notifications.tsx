@@ -74,7 +74,7 @@ export default function NotificationsScreen() {
       if (!granted) {
         Alert.alert(
           'Notifications blocked',
-          'Enable notifications for Mamanote in your phone Settings to receive medicine reminders.',
+          'Enable notifications for MamaNote in your phone Settings to receive medicine reminders.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => Linking.openSettings() },
@@ -112,7 +112,7 @@ export default function NotificationsScreen() {
           </View>
         </View>
         <Text className="leading-6">
-          Mamanote uses notifications for one thing:{' '}
+          MamaNote uses notifications for one thing:{' '}
           <Text className="font-semibold">medicine reminders</Text>. When you log a
           medicine and choose reminder times, we schedule daily alerts on your phone
           so you don&apos;t miss a dose.

@@ -1,4 +1,4 @@
--- Mamanote – initial Supabase schema
+-- MamaNote – initial Supabase schema
 -- Run this once in your Supabase project's SQL editor.
 
 -- 1. Profiles ----------------------------------------------------------------

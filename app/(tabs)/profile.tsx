@@ -45,7 +45,7 @@ export default function ProfileScreen() {
   }, [fetchSubscription]);
 
   const fullName =
-    (user?.user_metadata?.full_name as string | undefined) ?? 'Mamanote user';
+    (user?.user_metadata?.full_name as string | undefined) ?? 'MamaNote user';
 
   const handleManageBilling = async () => {
     setPortalLoading(true);
@@ -167,7 +167,7 @@ export default function ProfileScreen() {
       </Button>
 
       <Text muted variant="caption" className="mt-6 text-center">
-        Mamanote · v1.0.0
+        MamaNote · v1.0.0
       </Text>
 
       <PaywallSheet

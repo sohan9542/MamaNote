@@ -18,6 +18,11 @@ export type LogSubtype =
   | 'dirty'
   | 'both'
   | 'temperature'
+  | 'bath'
+  | 'tummy_time'
+  | 'growth'
+  | 'doctor'
+  | 'playtime'
   | 'left'
   | 'right';
 
@@ -28,6 +33,12 @@ export interface LogMetadata {
   durationMinutes?: number;
   temperature?: number;
   medicineName?: string;
+  /** Growth log — weight in kg */
+  weightKg?: number;
+  /** Growth log — height in cm */
+  heightCm?: number;
+  /** Sleep timer — day nap vs night */
+  sleepKind?: 'day' | 'night';
 }
 
 export interface QuickLogPreset {
@@ -93,6 +104,9 @@ export const QUICK_LOG_PRESETS: QuickLogPreset[] = [
     emoji: '📝',
     chips: [
       { id: 'temp', label: 'Temperature', metadata: { subtype: 'temperature' } },
+      { id: 'bath', label: 'Bath', metadata: { subtype: 'bath' } },
+      { id: 'tummy', label: 'Tummy time', metadata: { subtype: 'tummy_time' } },
+      { id: 'growth', label: 'Growth', metadata: { subtype: 'growth' } },
     ],
   },
 ];
@@ -101,13 +115,23 @@ export function getLogPreset(type: LogEntryType): QuickLogPreset {
   return QUICK_LOG_PRESETS.find((p) => p.type === type) ?? QUICK_LOG_PRESETS[0];
 }
 
+const QUICK_LABEL_METADATA: Record<string, LogMetadata> = {
+  Nutrition: { subtype: 'nutrition' },
+  Breastfeeding: { subtype: 'breastfeeding' },
+  Bottle: { subtype: 'bottle' },
+  Temperature: { subtype: 'temperature' },
+  Bath: { subtype: 'bath' },
+  'Tummy time': { subtype: 'tummy_time' },
+  Growth: { subtype: 'growth' },
+  Doctor: { subtype: 'doctor' },
+  Playtime: { subtype: 'playtime' },
+};
+
 /** Map home quick-action label → log preset metadata */
 export function metadataFromQuickLabel(
-  type: LogEntryType,
+  _type: LogEntryType,
   quickLabel?: string,
 ): LogMetadata {
-  if (type === 'feeding' && quickLabel === 'Nutrition') return { subtype: 'nutrition' };
-  if (type === 'feeding' && quickLabel === 'Breastfeeding') return { subtype: 'breastfeeding' };
-  if (type === 'note' && quickLabel === 'Temperature') return { subtype: 'temperature' };
-  return {};
+  if (!quickLabel) return {};
+  return QUICK_LABEL_METADATA[quickLabel] ?? {};
 }

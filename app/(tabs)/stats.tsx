@@ -10,7 +10,7 @@ import { RoutinePreviewCard } from '@components/RoutinePreviewCard';
 import { Screen } from '@components/Screen';
 import { StatsEntriesSheet } from '@components/StatsEntriesSheet';
 import { Text } from '@components/Text';
-import { WeeklyRoutineChart } from '@components/WeeklyRoutineChart';
+import { WeeklyAreaChart } from '@components/WeeklyAreaChart';
 import { getActivityById } from '@constants/activities';
 import { FREE_DAILY_LOG_LIMIT } from '@constants/freemium';
 import { countTodayLogsFromEntries } from '@lib/freemium';
@@ -22,9 +22,11 @@ import { countTodayForActivity } from '@utils/baby';
 import { PLUS_MESSAGES, promptPlusUpgrade, requirePlus } from '@utils/plusUpgrade';
 import {
   buildActivityMiniCharts,
-  buildWeeklyChartData,
-  type ChartBlock,
-  type DayChartData,
+  buildTrendChartData,
+  trendUsesWeeklyBuckets,
+  type StatsChartPeriod,
+  type TrendChartPoint,
+  weekDateKeyEnd,
 } from '@utils/scheduleChart';
 import {
   filterEntriesForStats,
@@ -50,14 +52,17 @@ export default function StatsScreen() {
   const isPremium = useSubscriptionStore((s) => s.isPremium);
   const canGenerateAi = useSubscriptionStore((s) => s.canGenerateAi);
 
-  const [periodDays] = useState(7);
+  const [chartPeriod, setChartPeriod] = useState<StatsChartPeriod>('7d');
   const [sheetFilter, setSheetFilter] = useState<StatsFilter | null>(null);
+
+  const periodDays =
+    chartPeriod === '30d' ? 30 : chartPeriod === 'all' ? 30 : 7;
 
   const activeBaby = babies.find((b) => b.id === activeBabyId) ?? babies[0] ?? null;
 
-  const weeklyData = useMemo(
-    () => buildWeeklyChartData(entries, periodDays),
-    [entries, periodDays],
+  const trendData = useMemo(
+    () => buildTrendChartData(entries, chartPeriod),
+    [entries, chartPeriod],
   );
 
   const activityCharts = useMemo(
@@ -134,12 +139,13 @@ export default function StatsScreen() {
     router.push('/routine');
   };
 
-  const handleBlockPress = (block: ChartBlock) => {
-    openSheet({ entryId: block.entryId });
-  };
-
-  const handleDayPress = (day: DayChartData) => {
-    openSheet({ dateKey: day.dateKey });
+  const handleTrendDayPress = (point: TrendChartPoint) => {
+    const weekly = trendUsesWeeklyBuckets(chartPeriod, trendData);
+    if (weekly) {
+      openSheet({ dateKey: point.dateKey, dateKeyEnd: weekDateKeyEnd(point.dateKey) });
+      return;
+    }
+    openSheet({ dateKey: point.dateKey });
   };
 
   const handleChartPress = (activityId: string) => {
@@ -226,11 +232,11 @@ export default function StatsScreen() {
       </View>
 
       <View className="mb-6">
-        <WeeklyRoutineChart
-          data={weeklyData}
-          title={`${periodDays} days`}
-          onBlockPress={handleBlockPress}
-          onDayPress={handleDayPress}
+        <WeeklyAreaChart
+          data={trendData}
+          period={chartPeriod}
+          onPeriodChange={setChartPeriod}
+          onDayPress={handleTrendDayPress}
         />
       </View>
 

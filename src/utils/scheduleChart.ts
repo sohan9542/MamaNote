@@ -89,6 +89,187 @@ export interface ActivityDayCount {
   counts: number[]; // per day, same order as weekly chart
 }
 
+export interface TrendChartPoint {
+  label: string;
+  dateKey: string;
+  sleepHours: number;
+  feedCount: number;
+  totalCount: number;
+}
+
+export type StatsChartPeriod = '7d' | '30d' | 'all';
+
+/** @deprecated use TrendChartPoint */
+export type WeeklyLinePoint = TrendChartPoint;
+
+function aggregateDayBlocks(blocks: ChartBlock[]): Omit<TrendChartPoint, 'label' | 'dateKey'> {
+  return {
+    sleepHours: blocks
+      .filter((b) => b.type === 'sleep')
+      .reduce((sum, b) => sum + b.durationHours, 0),
+    feedCount: blocks.filter((b) => b.type === 'feeding').length,
+    totalCount: blocks.length,
+  };
+}
+
+function buildDailyTrendPoints(entries: LogEntry[], dayCount: number): TrendChartPoint[] {
+  const days = buildWeeklyChartData(entries, dayCount);
+  return days.map((day) => ({
+    label: day.label,
+    dateKey: day.dateKey,
+    ...aggregateDayBlocks(day.blocks),
+  }));
+}
+
+function buildDailyTrendInRange(
+  entries: LogEntry[],
+  start: Date,
+  end: Date,
+): TrendChartPoint[] {
+  const points: TrendChartPoint[] = [];
+  const cursor = new Date(start);
+  cursor.setHours(0, 0, 0, 0);
+  const endDay = new Date(end);
+  endDay.setHours(0, 0, 0, 0);
+
+  while (cursor <= endDay) {
+    const next = new Date(cursor);
+    next.setDate(cursor.getDate() + 1);
+
+    const dayEntries = entries.filter((e) => {
+      const t = new Date(e.started_at);
+      return t >= cursor && t < next;
+    });
+
+    const blocks: ChartBlock[] = dayEntries.map((e) => {
+      const activity = getActivityForEntry(e.type, e.metadata as LogMetadata);
+      return {
+        entryId: e.id,
+        activityId: activity?.id ?? null,
+        type: e.type,
+        startHour: startHourFraction(e.started_at),
+        durationHours: entryDurationHours(e),
+        color: activity?.iconColor ?? ACTIVITY_CHART_COLORS[e.type],
+      };
+    });
+
+    const useShort =
+      endDay.getTime() - start.getTime() > 14 * 24 * 60 * 60 * 1000;
+    const label = useShort
+      ? cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+      : cursor.toLocaleDateString(undefined, { weekday: 'short' });
+
+    points.push({
+      label,
+      dateKey: localDateKey(cursor),
+      ...aggregateDayBlocks(blocks),
+    });
+
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return points;
+}
+
+function buildWeeklyTrendPoints(entries: LogEntry[]): TrendChartPoint[] {
+  if (entries.length === 0) return [];
+
+  const sorted = [...entries].sort(
+    (a, b) => new Date(a.started_at).getTime() - new Date(b.started_at).getTime(),
+  );
+  const first = new Date(sorted[0].started_at);
+  first.setHours(0, 0, 0, 0);
+  const now = new Date();
+  now.setHours(23, 59, 59, 999);
+
+  const daySpan = Math.ceil((now.getTime() - first.getTime()) / 86_400_000);
+  if (daySpan <= 45) {
+    return buildDailyTrendInRange(entries, first, now);
+  }
+
+  const points: TrendChartPoint[] = [];
+  const weekStart = new Date(first);
+  const dow = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() - dow);
+  weekStart.setHours(0, 0, 0, 0);
+
+  while (weekStart <= now) {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+
+    const weekEntries = entries.filter((e) => {
+      const t = new Date(e.started_at);
+      return t >= weekStart && t < weekEnd;
+    });
+
+    const blocks: ChartBlock[] = weekEntries.map((e) => {
+      const activity = getActivityForEntry(e.type, e.metadata as LogMetadata);
+      return {
+        entryId: e.id,
+        activityId: activity?.id ?? null,
+        type: e.type,
+        startHour: startHourFraction(e.started_at),
+        durationHours: entryDurationHours(e),
+        color: activity?.iconColor ?? ACTIVITY_CHART_COLORS[e.type],
+      };
+    });
+
+    const label = weekStart.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+
+    points.push({
+      label,
+      dateKey: localDateKey(weekStart),
+      ...aggregateDayBlocks(blocks),
+    });
+
+    weekStart.setDate(weekStart.getDate() + 7);
+  }
+
+  return points;
+}
+
+export function buildTrendChartData(
+  entries: LogEntry[],
+  period: StatsChartPeriod,
+): TrendChartPoint[] {
+  if (period === '7d') return buildDailyTrendPoints(entries, 7);
+  if (period === '30d') return buildDailyTrendPoints(entries, 30);
+  return buildWeeklyTrendPoints(entries);
+}
+
+export function periodLabel(period: StatsChartPeriod): string {
+  if (period === '7d') return '7 days';
+  if (period === '30d') return '30 days';
+  return 'All time';
+}
+
+export function trendUsesWeeklyBuckets(
+  period: StatsChartPeriod,
+  points: TrendChartPoint[],
+): boolean {
+  if (period !== 'all' || points.length < 2) return false;
+  const a = new Date(`${points[0].dateKey}T12:00:00`);
+  const b = new Date(`${points[1].dateKey}T12:00:00`);
+  const diffDays = (b.getTime() - a.getTime()) / 86_400_000;
+  return diffDays >= 6;
+}
+
+export function weekDateKeyEnd(weekStartKey: string): string {
+  const d = new Date(`${weekStartKey}T12:00:00`);
+  d.setDate(d.getDate() + 6);
+  return localDateKey(d);
+}
+
+export function buildWeeklyLineChartData(
+  entries: LogEntry[],
+  dayCount = 7,
+): TrendChartPoint[] {
+  return buildDailyTrendPoints(entries, dayCount);
+}
+
 export function buildActivityMiniCharts(
   entries: LogEntry[],
   dayCount = 7,

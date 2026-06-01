@@ -1,4 +1,4 @@
-# Mamanote app assets
+# MamaNote app assets
 
 Replace the placeholders below with your final artwork before shipping.
 

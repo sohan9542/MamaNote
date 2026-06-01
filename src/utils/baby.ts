@@ -66,6 +66,11 @@ const SUBTYPE_LABELS: Record<string, string> = {
   dirty: 'Dirty',
   both: 'Wet and Dirty',
   temperature: 'Temperature',
+  bath: 'Bath',
+  tummy_time: 'Tummy time',
+  growth: 'Growth',
+  doctor: 'Doctor visit',
+  playtime: 'Playtime',
 };
 
 const SIDE_LABELS: Record<string, string> = {
@@ -137,6 +142,15 @@ export function entryDetailLine(entry: LogEntry): string {
 
   if (meta.subtype === 'temperature' && meta.temperature != null) {
     return `${meta.temperature} °C`;
+  }
+  if (meta.subtype === 'growth') {
+    const parts: string[] = [];
+    if (meta.weightKg != null) parts.push(`${meta.weightKg} kg`);
+    if (meta.heightCm != null) parts.push(`${meta.heightCm} cm`);
+    if (parts.length) return parts.join(' · ');
+  }
+  if (meta.durationMinutes && entry.type === 'note') {
+    return `${formatDurationMinutes(meta.durationMinutes)}`;
   }
   if (entry.type === 'diaper' && meta.subtype) {
     return SUBTYPE_LABELS[meta.subtype] ?? 'Diaper change';

@@ -28,7 +28,7 @@ export default function FeedbackScreen() {
     if (!storeAvailable) {
       Alert.alert(
         'Coming soon',
-        'Store ratings will open once Mamanote is published on the Play Store and App Store.',
+        'Store ratings will open once MamaNote is published on the Play Store and App Store.',
       );
       return;
     }
@@ -86,7 +86,7 @@ export default function FeedbackScreen() {
           </View>
           <View className="flex-1">
             <Text variant="subtitle" className="font-semibold">
-              Enjoying Mamanote?
+              Enjoying MamaNote?
             </Text>
             <Text muted variant="caption">
               {storeAvailable

@@ -54,7 +54,7 @@ export default function SignInScreen() {
         <View className="mb-8 items-center gap-2">
           <Logo size={96} className="rounded-[20px]" />
           <Text variant="display" className="font-display">
-            Mamanote
+            MamaNote
           </Text>
           <Text muted className="text-center">
             Gentle tracking for your little one.
@@ -93,7 +93,7 @@ export default function SignInScreen() {
         </View>
 
         <View className="mt-6 flex-row items-center justify-center gap-1">
-          <Text muted>New to Mamanote?</Text>
+          <Text muted>New to MamaNote?</Text>
           <Link href="/(auth)/sign-up">
             <Text className="font-semibold text-pink-500">Create account</Text>
           </Link>

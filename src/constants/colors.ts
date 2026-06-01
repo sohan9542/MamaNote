@@ -1,5 +1,5 @@
 /**
- * Mamanote color palette.
+ * MamaNote color palette.
  * Soft, calming, premium pastel tones used across light & dark themes.
  * Mirrors the Tailwind config so JS code (e.g. status bars, charts, gradients)
  * can reference the same tokens.

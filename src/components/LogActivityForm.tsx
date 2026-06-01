@@ -60,14 +60,19 @@ export function LogActivityForm({
   const [amount, setAmount] = useState('');
   const [temperature, setTemperature] = useState('');
   const [notes, setNotes] = useState('');
+  const [weightKg, setWeightKg] = useState('');
+  const [heightCm, setHeightCm] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const isDiaper = activity.id === 'diaper';
   const isBreast = activity.id === 'breastfeeding';
   const isSleep = activity.id === 'sleep';
   const isTemp = activity.id === 'temperature';
+  const isGrowth = activity.id === 'growth';
+  const isTimedNote = ['bath', 'tummy_time', 'doctor', 'playtime'].includes(activity.id);
   const showAmount =
     activity.type === 'pump' ||
+    activity.id === 'bottle' ||
     metadata.subtype === 'nutrition' ||
     metadata.subtype === 'bottle';
 
@@ -84,6 +89,9 @@ export function LogActivityForm({
       finalMeta.temperature = Number(temperature);
       finalMeta.subtype = 'temperature';
     }
+
+    if (weightKg) finalMeta.weightKg = Number(weightKg);
+    if (heightCm) finalMeta.heightCm = Number(heightCm);
 
     if (isDiaper && !finalMeta.subtype) {
       Alert.alert('Pick a type', 'Select wet, dirty, or both.');
@@ -130,9 +138,11 @@ export function LogActivityForm({
     if (isBreast) return 'Which side?';
     if (isSleep) return 'How long?';
     if (isTemp) return 'Body temperature';
+    if (isGrowth) return 'Weight & height';
+    if (isTimedNote) return 'How long?';
     if (showAmount) return 'Amount (ml)';
     return 'Add details';
-  }, [isDiaper, isBreast, isSleep, isTemp, showAmount]);
+  }, [isDiaper, isBreast, isSleep, isTemp, isGrowth, isTimedNote, showAmount]);
 
   return (
     <View className="gap-5">
@@ -226,6 +236,38 @@ export function LogActivityForm({
           placeholder="36.6"
           keyboardType="decimal-pad"
         />
+      )}
+
+      {isGrowth && (
+        <View className="gap-3">
+          <Input
+            label="Weight (kg)"
+            value={weightKg}
+            onChangeText={setWeightKg}
+            placeholder="6.2"
+            keyboardType="decimal-pad"
+          />
+          <Input
+            label="Height (cm)"
+            value={heightCm}
+            onChangeText={setHeightCm}
+            placeholder="62"
+            keyboardType="numeric"
+          />
+        </View>
+      )}
+
+      {isTimedNote && (
+        <View className="flex-row flex-wrap justify-center gap-2">
+          {[5, 10, 15, 20, 30, 45].map((min) => (
+            <OptionChip
+              key={min}
+              label={`${min}m`}
+              selected={metadata.durationMinutes === min}
+              onPress={() => setMetadata((m) => ({ ...m, durationMinutes: min }))}
+            />
+          ))}
+        </View>
       )}
 
       {!isDiaper && (

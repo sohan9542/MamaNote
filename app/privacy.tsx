@@ -15,7 +15,7 @@ const SECTIONS: PrivacySection[] = [
   {
     title: 'Overview',
     body: [
-      'Mamanote helps you track your baby\'s daily care. We take privacy seriously and only collect what is needed to run the app.',
+      'MamaNote helps you track your baby\'s daily care. We take privacy seriously and only collect what is needed to run the app.',
       'This policy describes what we store, where it lives, and the choices you have.',
     ],
   },
@@ -56,7 +56,7 @@ const SECTIONS: PrivacySection[] = [
   {
     title: 'Notifications',
     body: [
-      'Mamanote uses local notifications on your device for medicine reminders only.',
+      'MamaNote uses local notifications on your device for medicine reminders only.',
       'We do not send marketing push notifications.',
       'You can turn notifications off anytime in your phone\'s Settings.',
     ],
@@ -91,7 +91,7 @@ export default function PrivacyScreen() {
     <Screen scroll contentClassName="pb-10">
       <ScreenBackHeader
         title="Privacy"
-        subtitle="How Mamanote handles your data"
+        subtitle="How MamaNote handles your data"
       />
 
       <Card tone="mint" className="mb-5 gap-2">
@@ -99,7 +99,7 @@ export default function PrivacyScreen() {
           Your family data stays yours
         </Text>
         <Text muted className="leading-6">
-          Mamanote is built for parents. We keep tracking simple, secure, and under your control.
+          MamaNote is built for parents. We keep tracking simple, secure, and under your control.
         </Text>
       </Card>
 
@@ -119,7 +119,7 @@ export default function PrivacyScreen() {
       </View>
 
       <Text muted variant="caption" className="mt-8 text-center">
-        Last updated May 2026 · Mamanote v{APP_VERSION}
+        Last updated May 2026 · MamaNote v{APP_VERSION}
       </Text>
     </Screen>
   );

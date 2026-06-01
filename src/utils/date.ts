@@ -31,6 +31,20 @@ export function babyAge(birthDateIso: string): string {
   return `${days} ${days === 1 ? 'day' : 'days'}`;
 }
 
+/** Whole months since birth (0–11+), for milestones. */
+export function babyAgeInMonths(birthDateIso: string): number {
+  return Math.max(0, differenceInMonths(new Date(), new Date(birthDateIso)));
+}
+
+export function formatElapsedTimer(startedAtIso: string): string {
+  const ms = Date.now() - new Date(startedAtIso).getTime();
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+}
+
 export function lastFeedLabel(startedAtIso: string | null): string {
   if (!startedAtIso) return 'No feeds logged yet';
 

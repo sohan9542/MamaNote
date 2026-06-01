@@ -24,6 +24,7 @@ import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import { useMedicineReminderStore } from '@store/medicineReminderStore';
+import { useSleepStore } from '@store/sleepStore';
 import { useThemeStore } from '@store/themeStore';
 import { useTheme } from '@hooks/useTheme';
 
@@ -72,6 +73,8 @@ function ThemedShell() {
   const fetchSubscription = useSubscriptionStore((s) => s.fetch);
   const hydrateMedicineReminders = useMedicineReminderStore((s) => s.hydrate);
   const medicineRemindersHydrated = useMedicineReminderStore((s) => s.hydrated);
+  const hydrateSleep = useSleepStore((s) => s.hydrate);
+  const sleepHydrated = useSleepStore((s) => s.hydrated);
   const initialized = useAuthStore((s) => s.initialized);
   const { isDark, colors } = useTheme();
   const paywallVisible = useSubscriptionStore((s) => s.paywallVisible);
@@ -104,6 +107,9 @@ function ThemedShell() {
       if (!medicineRemindersHydrated) {
         hydrateMedicineReminders();
       }
+      if (!sleepHydrated) {
+        void hydrateSleep();
+      }
     }
   }, [
     session,
@@ -112,6 +118,8 @@ function ThemedShell() {
     fetchSubscription,
     hydrateMedicineReminders,
     medicineRemindersHydrated,
+    hydrateSleep,
+    sleepHydrated,
   ]);
 
   useEffect(() => {
@@ -256,6 +264,11 @@ function ThemedShell() {
         <Stack.Screen name="privacy" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="add-baby" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen
+          name="growth-skills"
+          options={{ animation: 'slide_from_right' }}
+        />
+        <Stack.Screen name="sleep" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
       <PaywallSheet

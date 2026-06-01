@@ -1,4 +1,4 @@
-/** Plus Jakarta Sans — premium UI typography for Mamanote */
+/** Plus Jakarta Sans — premium UI typography for MamaNote */
 
 export const FontFamily = {
   regular: 'PlusJakartaSans_400Regular',

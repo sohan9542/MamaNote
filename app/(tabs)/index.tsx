@@ -9,6 +9,7 @@ import { BabySwitcher } from '@components/BabySwitcher';
 import { LogEntryDetailSheet } from '@components/LogEntryDetailSheet';
 import { LogEntryRow } from '@components/LogEntryRow';
 import { MedicineSheet } from '@components/MedicineSheet';
+import { FeatureHubCards } from '@components/FeatureHubCards';
 import { RoutinePreviewCard } from '@components/RoutinePreviewCard';
 import { QuickLogSheet } from '@components/QuickLogSheet';
 import { Screen } from '@components/Screen';
@@ -58,6 +59,10 @@ export default function HomeScreen() {
   }, [activeBabyId, fetchEntries, fetchLatestRoutine]);
 
   const openActivity = (activity: ActivityOption) => {
+    if (activity.id === 'sleep') {
+      router.push('/sleep');
+      return;
+    }
     setSheetActivity(activity);
   };
 
@@ -104,6 +109,8 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
+
+      {activeBaby ? <FeatureHubCards /> : null}
 
       {routine ? (
         <View className="mb-6">

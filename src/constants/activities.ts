@@ -1,10 +1,16 @@
 import type { LucideIcon } from 'lucide-react-native';
 import {
   Apple,
+  Bath,
+  Blocks,
+  CupSoda,
   Droplet,
+  Footprints,
+  Hospital,
   Layers,
   Milk,
   Moon,
+  Scale,
   Stethoscope,
   Thermometer,
 } from 'lucide-react-native';
@@ -43,6 +49,15 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
     bg: '#FFEDD5',
     iconColor: '#EA580C',
     defaultMetadata: { subtype: 'breastfeeding' },
+  },
+  {
+    id: 'bottle',
+    type: 'feeding',
+    label: 'Bottle',
+    icon: CupSoda,
+    bg: '#FCE7F3',
+    iconColor: '#DB2777',
+    defaultMetadata: { subtype: 'bottle' },
   },
   {
     id: 'medicine',
@@ -87,6 +102,51 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
     iconColor: '#DB2777',
     defaultMetadata: { subtype: 'temperature' },
   },
+  {
+    id: 'bath',
+    type: 'note',
+    label: 'Bath',
+    icon: Bath,
+    bg: '#E0F2FE',
+    iconColor: '#0284C7',
+    defaultMetadata: { subtype: 'bath' },
+  },
+  {
+    id: 'tummy_time',
+    type: 'note',
+    label: 'Tummy time',
+    icon: Footprints,
+    bg: '#FEF3C7',
+    iconColor: '#D97706',
+    defaultMetadata: { subtype: 'tummy_time' },
+  },
+  {
+    id: 'growth',
+    type: 'note',
+    label: 'Growth',
+    icon: Scale,
+    bg: '#F3E8FF',
+    iconColor: '#9333EA',
+    defaultMetadata: { subtype: 'growth' },
+  },
+  {
+    id: 'doctor',
+    type: 'note',
+    label: 'Doctor',
+    icon: Hospital,
+    bg: '#FEE2E2',
+    iconColor: '#DC2626',
+    defaultMetadata: { subtype: 'doctor' },
+  },
+  {
+    id: 'playtime',
+    type: 'note',
+    label: 'Playtime',
+    icon: Blocks,
+    bg: '#D1FAE5',
+    iconColor: '#059669',
+    defaultMetadata: { subtype: 'playtime' },
+  },
 ];
 
 export function getActivityById(id: string): ActivityOption | undefined {
@@ -97,9 +157,10 @@ export function resolveActivityFromParams(
   type?: string,
   note?: string,
 ): ActivityOption {
-  if (note === 'Nutrition') return HOME_ACTIVITIES.find((a) => a.id === 'nutrition')!;
-  if (note === 'Temperature') return HOME_ACTIVITIES.find((a) => a.id === 'temperature')!;
-  if (note === 'Breastfeeding') return HOME_ACTIVITIES.find((a) => a.id === 'breastfeeding')!;
+  if (note) {
+    const byLabel = HOME_ACTIVITIES.find((a) => a.label === note);
+    if (byLabel) return byLabel;
+  }
   const match = HOME_ACTIVITIES.find((a) => a.type === type);
   return match ?? HOME_ACTIVITIES[1];
 }
@@ -109,14 +170,11 @@ export function getActivityForEntry(
   metadata?: LogMetadata | null,
 ): ActivityOption | undefined {
   const subtype = metadata?.subtype;
-  if (type === 'feeding' && subtype === 'nutrition') {
-    return HOME_ACTIVITIES.find((a) => a.id === 'nutrition');
+  if (subtype) {
+    const bySubtype = HOME_ACTIVITIES.find((a) => a.defaultMetadata?.subtype === subtype);
+    if (bySubtype) return bySubtype;
   }
-  if (type === 'feeding' && subtype === 'breastfeeding') {
-    return HOME_ACTIVITIES.find((a) => a.id === 'breastfeeding');
-  }
-  if (type === 'note' && subtype === 'temperature') {
-    return HOME_ACTIVITIES.find((a) => a.id === 'temperature');
-  }
-  return HOME_ACTIVITIES.find((a) => a.type === type && !a.defaultMetadata?.subtype);
+  return HOME_ACTIVITIES.find(
+    (a) => a.type === type && !a.defaultMetadata?.subtype,
+  );
 }

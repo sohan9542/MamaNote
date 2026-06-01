@@ -58,7 +58,7 @@ async function ensureAndroidChannels(Notifications: NotificationsModule) {
   if (Platform.OS !== 'android') return;
 
   await Notifications.setNotificationChannelAsync('default', {
-    name: 'Mamanote reminders',
+    name: 'MamaNote reminders',
     importance: Notifications.AndroidImportance.DEFAULT,
     vibrationPattern: [0, 250, 250, 250],
     lightColor: '#F9A8B4',
@@ -135,7 +135,7 @@ export async function cancelMedicineNotifications(babyId: string) {
 
 export async function syncMedicineReminders(reminders: MedicineReminder[]) {
   if (requiresDevBuildForNotifications()) {
-    console.warn('[Mamanote]', devBuildRequiredMessage());
+    console.warn('[MamaNote]', devBuildRequiredMessage());
     return;
   }
 
@@ -174,7 +174,7 @@ export async function syncMedicineReminders(reminders: MedicineReminder[]) {
       }
     }
   } catch (error) {
-    console.warn('[Mamanote] Failed to sync medicine notifications', error);
+    console.warn('[MamaNote] Failed to sync medicine notifications', error);
   }
 }
 
@@ -191,13 +191,13 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
   try {
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
     if (!projectId || projectId === 'your-eas-project-id') {
-      console.warn('[Mamanote] Set extra.eas.projectId in app.json for push tokens');
+      console.warn('[MamaNote] Set extra.eas.projectId in app.json for push tokens');
       return null;
     }
     const token = await Notifications.getExpoPushTokenAsync({ projectId });
     return token.data;
   } catch (error) {
-    console.warn('[Mamanote] Failed to get push token', error);
+    console.warn('[MamaNote] Failed to get push token', error);
     return null;
   }
 }
