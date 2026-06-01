@@ -9,6 +9,7 @@ create table if not exists public.subscriptions (
   paddle_subscription_id text,
   free_ai_generations_used int not null default 0,
   current_period_end timestamptz,
+  complimentary_premium_until timestamptz,
   updated_at timestamptz not null default now()
 );
 
@@ -30,8 +31,8 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.subscriptions (user_id)
-  values (new.id)
+  insert into public.subscriptions (user_id, complimentary_premium_until)
+  values (new.id, now() + interval '7 days')
   on conflict (user_id) do nothing;
   return new;
 end;

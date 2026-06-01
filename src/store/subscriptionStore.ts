@@ -6,6 +6,11 @@ import {
   type SubscriptionStatus,
 } from '@constants/subscription';
 import { supabase } from '@lib/supabase';
+import {
+  buildFreemiumAccess,
+  complimentaryDaysRemaining,
+  type FreemiumAccess,
+} from '@lib/subscriptionAccess';
 
 export interface SubscriptionEntitlement {
   status: SubscriptionStatus;
@@ -13,6 +18,7 @@ export interface SubscriptionEntitlement {
   freeAiGenerationsUsed: number;
   currentPeriodEnd: string | null;
   paddleCustomerId: string | null;
+  complimentaryPremiumUntil: string | null;
 }
 
 interface SubscriptionState {
@@ -20,16 +26,19 @@ interface SubscriptionState {
   loading: boolean;
   error: string | null;
   paywallVisible: boolean;
-  upgradePromptVisible: boolean;
 
+  getFreemiumAccess: () => FreemiumAccess;
+  hasPaidPremium: () => boolean;
+  isComplimentaryPremium: () => boolean;
   isPremium: () => boolean;
+  isLimitedFree: () => boolean;
+  getDailyLogLimit: () => number;
+  complimentaryDaysRemaining: () => number | null;
   canGenerateAi: () => boolean;
   hasUsedFreeGeneration: () => boolean;
   fetch: () => Promise<void>;
   showPaywall: () => void;
   hidePaywall: () => void;
-  showUpgradePrompt: () => void;
-  hideUpgradePrompt: () => void;
   clear: () => void;
 }
 
@@ -39,6 +48,7 @@ const DEFAULT: SubscriptionEntitlement = {
   freeAiGenerationsUsed: 0,
   currentPeriodEnd: null,
   paddleCustomerId: null,
+  complimentaryPremiumUntil: null,
 };
 
 export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
@@ -46,12 +56,27 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   loading: false,
   error: null,
   paywallVisible: false,
-  upgradePromptVisible: false,
 
-  isPremium: () => {
+  getFreemiumAccess: () => buildFreemiumAccess(get().entitlement),
+
+  hasPaidPremium: () => {
     const status = get().entitlement?.status ?? 'free';
     return PREMIUM_STATUSES.includes(status);
   },
+
+  isComplimentaryPremium: () => {
+    const until = get().entitlement?.complimentaryPremiumUntil;
+    return until != null && new Date(until) > new Date();
+  },
+
+  isPremium: () => get().getFreemiumAccess().isPremium,
+
+  isLimitedFree: () => get().getFreemiumAccess().isLimitedFree,
+
+  getDailyLogLimit: () => get().getFreemiumAccess().dailyLogLimit,
+
+  complimentaryDaysRemaining: () =>
+    complimentaryDaysRemaining(get().entitlement?.complimentaryPremiumUntil),
 
   canGenerateAi: () => get().isPremium(),
 
@@ -69,7 +94,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
       const { data, error } = await supabase
         .from('subscriptions')
         .select(
-          'status, plan, free_ai_generations_used, current_period_end, paddle_customer_id',
+          'status, plan, free_ai_generations_used, current_period_end, paddle_customer_id, complimentary_premium_until',
         )
         .eq('user_id', user.id)
         .maybeSingle();
@@ -84,6 +109,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
               freeAiGenerationsUsed: data.free_ai_generations_used,
               currentPeriodEnd: data.current_period_end,
               paddleCustomerId: data.paddle_customer_id,
+              complimentaryPremiumUntil: data.complimentary_premium_until,
             }
           : DEFAULT,
         loading: false,
@@ -95,8 +121,6 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
 
   showPaywall: () => set({ paywallVisible: true }),
   hidePaywall: () => set({ paywallVisible: false }),
-  showUpgradePrompt: () => set({ upgradePromptVisible: true }),
-  hideUpgradePrompt: () => set({ upgradePromptVisible: false }),
 
   clear: () =>
     set({
@@ -104,6 +128,5 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
       loading: false,
       error: null,
       paywallVisible: false,
-      upgradePromptVisible: false,
     }),
 }));

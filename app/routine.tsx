@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { ChevronLeft, RefreshCw } from 'lucide-react-native';
 
 import { Button } from '@components/Button';
-import { PaywallSheet } from '@components/PaywallSheet';
 import { RoutineBlockList, RoutineNextCards } from '@components/RoutineBlockList';
 import { RoutineSourceBadge } from '@components/RoutineSourceBadge';
 import { RoutineTimelineChart } from '@components/RoutineTimelineChart';
@@ -31,8 +30,6 @@ export default function RoutineScreen() {
   const fetchLatest = useScheduleStore((s) => s.fetchLatest);
   const generate = useScheduleStore((s) => s.generate);
 
-  const paywallVisible = useSubscriptionStore((s) => s.paywallVisible);
-  const hidePaywall = useSubscriptionStore((s) => s.hidePaywall);
   const fetchSubscription = useSubscriptionStore((s) => s.fetch);
 
   const activeBaby = babies.find((b) => b.id === activeBabyId) ?? babies[0] ?? null;
@@ -63,11 +60,6 @@ export default function RoutineScreen() {
         promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
       }
     }
-  };
-
-  const handlePaywallClose = () => {
-    hidePaywall();
-    clearPremiumRequired();
   };
 
   return (
@@ -148,11 +140,6 @@ export default function RoutineScreen() {
         </>
       )}
 
-      <PaywallSheet
-        visible={paywallVisible}
-        onClose={handlePaywallClose}
-        onSubscribed={fetchSubscription}
-      />
     </Screen>
   );
 }

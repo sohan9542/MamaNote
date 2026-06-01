@@ -1,12 +1,6 @@
-import {
-  FREE_BABY_LIMIT,
-  FREE_DAILY_LOG_LIMIT,
-  FREE_MEDICINE_REMINDER_LIMIT,
-  FREE_SHARES_PER_WEEK,
-  type FreemiumLimitCode,
-} from '@constants/freemium';
+import { FREE_BABY_LIMIT, type FreemiumLimitCode } from '@constants/freemium';
 import { supabase } from '@lib/supabase';
-import type { MedicineReminder } from '@app-types/medicineReminder';
+import type { FreemiumAccess } from '@lib/subscriptionAccess';
 import { localDateKey } from '@utils/date';
 
 export class FreemiumLimitError extends Error {
@@ -46,100 +40,57 @@ export function countTodayLogsFromEntries(
   ).length;
 }
 
-export async function assertCanAddLog(babyId: string, isPremium: boolean) {
-  if (isPremium) return;
+export async function assertCanAddLog(babyId: string, access: FreemiumAccess) {
+  if (access.isPremium) return;
   const count = await countTodayLogs(babyId);
-  if (count >= FREE_DAILY_LOG_LIMIT) {
+  const limit = access.dailyLogLimit;
+  if (count >= limit) {
     throw new FreemiumLimitError(
       'daily_logs',
-      `Free accounts can save up to ${FREE_DAILY_LOG_LIMIT} activities per day. Upgrade to MamaNote Plus for unlimited logging.`,
+      `You can save up to ${limit} new activities per day. Upgrade to MamaNote Plus for unlimited logging.`,
     );
   }
 }
 
-export function assertCanAddBaby(currentCount: number, isPremium: boolean) {
-  if (isPremium) return;
+export function assertCanAddBaby(currentCount: number, access: FreemiumAccess) {
+  if (access.isPremium) return;
   if (currentCount >= FREE_BABY_LIMIT) {
     throw new FreemiumLimitError(
       'baby_profiles',
-      `Free accounts include ${FREE_BABY_LIMIT} baby profile. Upgrade to MamaNote Plus for multiple babies.`,
+      'Multiple baby profiles are included with MamaNote Plus.',
     );
   }
 }
 
-export async function assertCanCreateShare(userId: string, isPremium: boolean) {
-  if (isPremium) return;
-
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-
-  const { count, error } = await supabase
-    .from('activity_shares')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('created_at', weekAgo.toISOString());
-
-  if (error) throw new Error(error.message);
-  if ((count ?? 0) >= FREE_SHARES_PER_WEEK) {
-    throw new FreemiumLimitError(
-      'share_links',
-      `Free accounts can create ${FREE_SHARES_PER_WEEK} share link per week. Upgrade to MamaNote Plus for unlimited sharing.`,
-    );
-  }
-}
-
-export function countActiveMedicineReminders(
-  remindersByBaby: Record<string, MedicineReminder[]>,
-): number {
-  return Object.values(remindersByBaby)
-    .flat()
-    .filter((reminder) => reminder.enabled && reminder.times.length > 0).length;
-}
-
-export function assertCanAddMedicineReminder(
-  remindersByBaby: Record<string, MedicineReminder[]>,
-  isPremium: boolean,
-  options?: { excludeReminderId?: string; isUpdate?: boolean },
-) {
-  if (isPremium) return;
-
-  const active = Object.values(remindersByBaby)
-    .flat()
-    .filter(
-      (reminder) =>
-        reminder.enabled &&
-        reminder.times.length > 0 &&
-        reminder.id !== options?.excludeReminderId,
-    );
-
-  if (options?.isUpdate && active.length <= FREE_MEDICINE_REMINDER_LIMIT) return;
-
-  if (active.length >= FREE_MEDICINE_REMINDER_LIMIT) {
-    throw new FreemiumLimitError(
-      'medicine_reminders',
-      `Free accounts include ${FREE_MEDICINE_REMINDER_LIMIT} medicine reminder. Upgrade to MamaNote Plus for unlimited reminders.`,
-    );
-  }
-}
-
-export function assertFullInsights(isPremium: boolean) {
-  if (isPremium) return;
+export async function assertCanCreateShare(_userId: string, access: FreemiumAccess) {
+  if (access.isPremium) return;
   throw new FreemiumLimitError(
-    'full_insights',
-    'Weekly insights and AI routines are part of MamaNote Plus.',
+    'share_links',
+    'Sharing activity links with family is part of MamaNote Plus.',
   );
 }
 
-export function freemiumLimitMessage(code: FreemiumLimitCode): string {
+export function assertFullInsights(access: FreemiumAccess) {
+  if (access.isPremium) return;
+  throw new FreemiumLimitError(
+    'full_insights',
+    'Weekly insights and AI routines require MamaNote Plus.',
+  );
+}
+
+export function freemiumLimitMessage(
+  code: FreemiumLimitCode,
+  dailyLogLimit?: number,
+): string {
   switch (code) {
     case 'daily_logs':
-      return `You've reached today's ${FREE_DAILY_LOG_LIMIT}-log limit on the free plan.`;
+      return dailyLogLimit != null
+        ? `You've reached today's ${dailyLogLimit}-log limit. Upgrade to MamaNote Plus for unlimited logging.`
+        : `You've reached today's log limit.`;
     case 'baby_profiles':
       return 'Multiple baby profiles require MamaNote Plus.';
     case 'share_links':
-      return `Free plan includes ${FREE_SHARES_PER_WEEK} share link per week.`;
-    case 'medicine_reminders':
-      return `Free plan includes ${FREE_MEDICINE_REMINDER_LIMIT} medicine reminder.`;
+      return 'Sharing with family requires MamaNote Plus.';
     case 'full_insights':
       return 'Full insights and AI routines require MamaNote Plus.';
     default:

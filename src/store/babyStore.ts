@@ -3,7 +3,8 @@ import { create } from 'zustand';
 
 import { supabase } from '@lib/supabase';
 import { assertCanAddBaby, assertCanAddLog } from '@lib/freemium';
-import { trackLogSaved } from '@lib/freemiumPrompt';
+import { trackLogSavedForRating } from '@lib/ratingPrompt';
+import { useRatingPromptStore } from '@store/ratingPromptStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import type {
   Baby,
@@ -84,8 +85,8 @@ export const useBabyStore = create<BabyState>((set, get) => ({
   },
 
   createBaby: async ({ userId, name, birthDate, gender }) => {
-    const isPremium = useSubscriptionStore.getState().isPremium();
-    assertCanAddBaby(get().babies.length, isPremium);
+    const access = useSubscriptionStore.getState().getFreemiumAccess();
+    assertCanAddBaby(get().babies.length, access);
 
     set({ loading: true, error: null });
     const { data, error } = await supabase
@@ -164,8 +165,8 @@ export const useBabyStore = create<BabyState>((set, get) => ({
   },
 
   addEntry: async (entry) => {
-    const isPremium = useSubscriptionStore.getState().isPremium();
-    await assertCanAddLog(entry.baby_id, isPremium);
+    const access = useSubscriptionStore.getState().getFreemiumAccess();
+    await assertCanAddLog(entry.baby_id, access);
 
     const { data, error } = await supabase
       .from('log_entries')
@@ -178,8 +179,8 @@ export const useBabyStore = create<BabyState>((set, get) => ({
     }
     if (data) {
       set({ entries: [data, ...get().entries] });
-      await trackLogSaved(isPremium, () => {
-        useSubscriptionStore.getState().showUpgradePrompt();
+      await trackLogSavedForRating(entry.user_id, () => {
+        useRatingPromptStore.getState().show();
       });
     }
   },

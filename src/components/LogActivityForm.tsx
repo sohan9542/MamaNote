@@ -1,27 +1,21 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
 import { Button } from './Button';
 import { Input } from './Input';
 import { OptionChip } from './OptionChip';
+import { SleepLogFields } from './SleepLogFields';
 import { Text } from './Text';
 import type { ActivityOption } from '@constants/activities';
 import type { LogMetadata } from '@constants/logFields';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { handleFreemiumError } from '@utils/freemiumError';
+import { initialSleepLogState, resolveSleepEntryTimes, type SleepLogState } from '@utils/sleepLog';
 import { cn } from '@utils/cn';
-import type { LogEntryType } from '@app-types/database';
 
 const AMOUNT_PRESETS = [60, 90, 120, 150, 180];
-const SLEEP_DURATIONS = [
-  { label: '30m', minutes: 30 },
-  { label: '1h', minutes: 60 },
-  { label: '1.5h', minutes: 90 },
-  { label: '2h', minutes: 120 },
-  { label: '10h', minutes: 600 },
-];
 
 const DIAPER_OPTIONS: { label: string; subtype: LogMetadata['subtype'] }[] = [
   { label: 'Wet', subtype: 'wet' },
@@ -40,7 +34,6 @@ interface Props {
   activity: ActivityOption;
   onSaved?: () => void;
   onCancel?: () => void;
-  /** Hide outer save button area when parent handles it */
   showActions?: boolean;
 }
 
@@ -62,6 +55,7 @@ export function LogActivityForm({
   const [notes, setNotes] = useState('');
   const [weightKg, setWeightKg] = useState('');
   const [heightCm, setHeightCm] = useState('');
+  const [sleepLog, setSleepLog] = useState<SleepLogState>(() => initialSleepLogState());
   const [submitting, setSubmitting] = useState(false);
 
   const isDiaper = activity.id === 'diaper';
@@ -76,14 +70,40 @@ export function LogActivityForm({
     metadata.subtype === 'nutrition' ||
     metadata.subtype === 'bottle';
 
+  useEffect(() => {
+    setMetadata({ ...activity.defaultMetadata });
+    setAmount('');
+    setTemperature('');
+    setNotes('');
+    setWeightKg('');
+    setHeightCm('');
+    if (activity.id === 'sleep') {
+      setSleepLog(initialSleepLogState());
+    }
+  }, [activity.id]);
+
   const save = async (overrideMeta?: Partial<LogMetadata>) => {
     if (!user || !activeBabyId) {
       Alert.alert('No baby yet', 'Complete baby setup first.');
       return;
     }
 
-    const startedAt = new Date().toISOString();
     const finalMeta: LogMetadata = { ...metadata, ...overrideMeta };
+    let startedAt = new Date().toISOString();
+    let endedAt: string | null = null;
+
+    if (isSleep) {
+      const resolved = resolveSleepEntryTimes(sleepLog);
+      if ('error' in resolved) {
+        Alert.alert('Sleep log', resolved.error);
+        return;
+      }
+      startedAt = resolved.started_at;
+      endedAt = resolved.ended_at;
+      finalMeta.durationMinutes = resolved.durationMinutes;
+    } else {
+      endedAt = buildEndedAt(startedAt, finalMeta.durationMinutes);
+    }
 
     if (temperature) {
       finalMeta.temperature = Number(temperature);
@@ -110,7 +130,7 @@ export function LogActivityForm({
         user_id: user.id,
         type: activity.type,
         started_at: startedAt,
-        ended_at: buildEndedAt(startedAt, finalMeta.durationMinutes),
+        ended_at: endedAt,
         amount: amount ? Number(amount) : null,
         unit: showAmount ? 'ml' : null,
         notes: notes || null,
@@ -136,7 +156,7 @@ export function LogActivityForm({
   const headerHint = useMemo(() => {
     if (isDiaper) return 'Tap to log instantly';
     if (isBreast) return 'Which side?';
-    if (isSleep) return 'How long?';
+    if (isSleep) return 'How long, or from what time to what time?';
     if (isTemp) return 'Body temperature';
     if (isGrowth) return 'Weight & height';
     if (isTimedNote) return 'How long?';
@@ -193,18 +213,7 @@ export function LogActivityForm({
         </>
       )}
 
-      {isSleep && (
-        <View className="flex-row flex-wrap justify-center gap-2">
-          {SLEEP_DURATIONS.map((d) => (
-            <OptionChip
-              key={d.minutes}
-              label={d.label}
-              selected={metadata.durationMinutes === d.minutes}
-              onPress={() => setMetadata((m) => ({ ...m, durationMinutes: d.minutes }))}
-            />
-          ))}
-        </View>
-      )}
+      {isSleep && <SleepLogFields value={sleepLog} onChange={setSleepLog} />}
 
       {showAmount && (
         <>

@@ -11,7 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View } from 'react-native';
 
 import { ThemeBridge } from '@components/ThemeBridge';
-import { FreemiumUpgradeSheet } from '@components/FreemiumUpgradeSheet';
+import { RatingPromptSheet } from '@components/RatingPromptSheet';
 import { PaywallSheet } from '@components/PaywallSheet';
 import { useAppFonts } from '@hooks/useAppFonts';
 import { isEmailConfirmed } from '@lib/auth';
@@ -22,6 +22,7 @@ import {
 } from '@lib/subscription';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
+import { useRatingPromptStore } from '@store/ratingPromptStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import { useMedicineReminderStore } from '@store/medicineReminderStore';
 import { useSleepStore } from '@store/sleepStore';
@@ -78,10 +79,9 @@ function ThemedShell() {
   const initialized = useAuthStore((s) => s.initialized);
   const { isDark, colors } = useTheme();
   const paywallVisible = useSubscriptionStore((s) => s.paywallVisible);
-  const upgradePromptVisible = useSubscriptionStore((s) => s.upgradePromptVisible);
   const hidePaywall = useSubscriptionStore((s) => s.hidePaywall);
-  const hideUpgradePrompt = useSubscriptionStore((s) => s.hideUpgradePrompt);
-  const showPaywall = useSubscriptionStore((s) => s.showPaywall);
+  const ratingPromptVisible = useRatingPromptStore((s) => s.visible);
+  const hideRatingPrompt = useRatingPromptStore((s) => s.hide);
 
   const onVerifyScreen = pathname.includes('verify-email');
   const onVerifyResetScreen = pathname.includes('verify-reset-password');
@@ -276,14 +276,7 @@ function ThemedShell() {
         onClose={hidePaywall}
         onSubscribed={fetchSubscription}
       />
-      <FreemiumUpgradeSheet
-        visible={upgradePromptVisible}
-        onClose={hideUpgradePrompt}
-        onUpgrade={() => {
-          hideUpgradePrompt();
-          showPaywall();
-        }}
-      />
+      <RatingPromptSheet visible={ratingPromptVisible} onClose={hideRatingPrompt} />
     </View>
   );
 }

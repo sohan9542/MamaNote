@@ -171,17 +171,27 @@ Deno.serve(async (req) => {
 
     let { data: entitlement } = await serviceClient
       .from("subscriptions")
-      .select("status, free_ai_generations_used")
+      .select(
+        "status, free_ai_generations_used, complimentary_premium_until",
+      )
       .eq("user_id", user.id)
       .maybeSingle();
 
     if (!entitlement) {
       await serviceClient.from("subscriptions").insert({ user_id: user.id });
-      entitlement = { status: "free", free_ai_generations_used: 0 };
+      entitlement = {
+        status: "free",
+        free_ai_generations_used: 0,
+        complimentary_premium_until: null,
+      };
     }
 
-    const isPremium = entitlement.status === "active" ||
+    const hasPaidPremium = entitlement.status === "active" ||
       entitlement.status === "trialing";
+    const complimentaryUntil = entitlement.complimentary_premium_until;
+    const isComplimentaryPremium = complimentaryUntil != null &&
+      new Date(complimentaryUntil) > new Date();
+    const isPremium = hasPaidPremium || isComplimentaryPremium;
 
     if (!isPremium) {
       return jsonResponse(

@@ -9,6 +9,8 @@ import { Text } from '@components/Text';
 import {
   PLANS,
   PLUS_FEATURES,
+  planCheckoutCta,
+  planCheckoutFootnote,
   type SubscriptionPlan,
 } from '@constants/subscription';
 import {
@@ -141,14 +143,11 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
           ) : null}
 
           <Button onPress={handleSubscribe} loading={loading} fullWidth size="lg">
-            {selectedPlan === 'annual'
-              ? 'Start 7-day free trial'
-              : 'Subscribe with Paddle'}
+            {planCheckoutCta(selectedPlan)}
           </Button>
 
           <Text variant="caption" muted className="mt-3 text-center leading-5">
-            Secure checkout opens inside the app.
-            {'\n'}Cancel anytime in your Paddle account.
+            {planCheckoutFootnote(selectedPlan)}
           </Text>
         </View>
       </View>

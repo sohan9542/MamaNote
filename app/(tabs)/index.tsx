@@ -10,6 +10,7 @@ import { LogEntryDetailSheet } from '@components/LogEntryDetailSheet';
 import { LogEntryRow } from '@components/LogEntryRow';
 import { MedicineSheet } from '@components/MedicineSheet';
 import { FeatureHubCards } from '@components/FeatureHubCards';
+import { TrialStatusBanner } from '@components/TrialStatusBanner';
 import { RoutinePreviewCard } from '@components/RoutinePreviewCard';
 import { QuickLogSheet } from '@components/QuickLogSheet';
 import { Screen } from '@components/Screen';
@@ -25,6 +26,7 @@ import {
 } from '@utils/baby';
 import { formatHeaderDate } from '@utils/date';
 import type { LogEntry } from '@app-types/database';
+import { PLUS_MESSAGES, requirePlus } from '@utils/plusUpgrade';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -59,11 +61,17 @@ export default function HomeScreen() {
   }, [activeBabyId, fetchEntries, fetchLatestRoutine]);
 
   const openActivity = (activity: ActivityOption) => {
-    if (activity.id === 'sleep') {
-      router.push('/sleep');
-      return;
-    }
     setSheetActivity(activity);
+  };
+
+  const openShare = () => {
+    if (!requirePlus(PLUS_MESSAGES.share)) return;
+    router.push('/share');
+  };
+
+  const openRoutine = () => {
+    if (!requirePlus(PLUS_MESSAGES.routinePreview)) return;
+    router.push('/routine');
   };
 
   const firstName =
@@ -83,7 +91,7 @@ export default function HomeScreen() {
           </Text>
           <View className="flex-row items-center gap-2">
             <Pressable
-              onPress={() => router.push('/share')}
+              onPress={openShare}
               hitSlop={8}
               className="h-11 w-11 items-center justify-center rounded-full bg-ink-50 dark:bg-ink-600"
             >
@@ -95,6 +103,8 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
+
+      {/* <TrialStatusBanner /> */}
 
       {activeBaby ? (
         <>
@@ -114,10 +124,7 @@ export default function HomeScreen() {
 
       {routine ? (
         <View className="mb-6">
-          <RoutinePreviewCard
-            routine={routine}
-            onPress={() => router.push('/routine')}
-          />
+          <RoutinePreviewCard routine={routine} onPress={openRoutine} />
         </View>
       ) : null}
 

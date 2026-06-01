@@ -17,16 +17,13 @@ import {
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useMedicineReminderStore } from '@store/medicineReminderStore';
-import { useSubscriptionStore } from '@store/subscriptionStore';
-import { assertCanAddMedicineReminder } from '@lib/freemium';
-import { handleFreemiumError } from '@utils/freemiumError';
 import { MEDICINE_TIME_PRESETS } from '@app-types/medicineReminder';
 import {
   formatMedicineTime,
   toTimeString,
   uniqueTimes,
 } from '@utils/medicineTime';
-import { medicineNamesMatch } from '@utils/medicineReminder';
+import { findMatchingRemindersForMedicine } from '@utils/medicineReminder';
 
 interface Props {
   active?: boolean;
@@ -45,9 +42,6 @@ export function MedicineForm({ active = true, onSaved }: Props) {
   const remindersByBaby = useMedicineReminderStore((s) => s.remindersByBaby);
   const saveReminder = useMedicineReminderStore((s) => s.saveReminder);
   const deleteReminder = useMedicineReminderStore((s) => s.deleteReminder);
-  const isPremium = useSubscriptionStore((s) => s.isPremium);
-
-  const existing = activeBabyId ? getForBaby(activeBabyId)[0] : undefined;
 
   const [medicineName, setMedicineName] = useState('');
   const [times, setTimes] = useState<string[]>([]);
@@ -55,19 +49,29 @@ export function MedicineForm({ active = true, onSaved }: Props) {
   const [customTime, setCustomTime] = useState(defaultReminderTime);
   const [saving, setSaving] = useState(false);
 
+  const remindersForBaby = useMemo(
+    () => (activeBabyId ? getForBaby(activeBabyId) : []),
+    [activeBabyId, getForBaby, remindersByBaby],
+  );
+
+  const existing = useMemo(() => {
+    const name = medicineName.trim();
+    if (!name) return undefined;
+    const matches = findMatchingRemindersForMedicine(remindersForBaby, name);
+    return matches[0];
+  }, [medicineName, remindersForBaby]);
+
   useEffect(() => {
     if (!active) return;
     if (existing) {
-      setMedicineName(existing.medicineName);
       setTimes(existing.times);
       setReminderId(existing.id);
     } else {
-      setMedicineName('');
       setTimes([]);
       setReminderId(newReminderId());
     }
     setCustomTime(defaultReminderTime());
-  }, [active, existing?.id, existing?.medicineName, existing?.times]);
+  }, [active, existing?.id, existing?.times]);
 
   const sortedTimes = useMemo(() => uniqueTimes(times), [times]);
 
@@ -135,12 +139,6 @@ export function MedicineForm({ active = true, onSaved }: Props) {
       });
 
       if (wantsReminders) {
-        const isUpdatingSame =
-          Boolean(existing) && medicineNamesMatch(existing!.medicineName, name);
-        assertCanAddMedicineReminder(remindersByBaby, isPremium(), {
-          excludeReminderId: isUpdatingSame ? existing!.id : undefined,
-          isUpdate: isUpdatingSame,
-        });
         await saveReminder({
           id: reminderId,
           babyId: activeBabyId,
@@ -156,7 +154,6 @@ export function MedicineForm({ active = true, onSaved }: Props) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onSaved();
     } catch (error) {
-      if (handleFreemiumError(error)) return;
       Alert.alert('Could not save', (error as Error).message);
     } finally {
       setSaving(false);

@@ -15,7 +15,6 @@ import {
 import { BabyManagerCard } from '@components/BabyManagerCard';
 import { Button } from '@components/Button';
 import { Card } from '@components/Card';
-import { PaywallSheet } from '@components/PaywallSheet';
 import { Screen } from '@components/Screen';
 import { Text } from '@components/Text';
 import { ThemeToggle } from '@components/ThemeToggle';
@@ -32,10 +31,12 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
 
   const entitlement = useSubscriptionStore((s) => s.entitlement);
+  const hasPaidPremium = useSubscriptionStore((s) => s.hasPaidPremium);
   const isPremium = useSubscriptionStore((s) => s.isPremium);
-  const paywallVisible = useSubscriptionStore((s) => s.paywallVisible);
+  const isComplimentaryPremium = useSubscriptionStore((s) => s.isComplimentaryPremium);
+  const isLimitedFree = useSubscriptionStore((s) => s.isLimitedFree);
+  const complimentaryDaysLeft = useSubscriptionStore((s) => s.complimentaryDaysRemaining);
   const showPaywall = useSubscriptionStore((s) => s.showPaywall);
-  const hidePaywall = useSubscriptionStore((s) => s.hidePaywall);
   const fetchSubscription = useSubscriptionStore((s) => s.fetch);
 
   const [portalLoading, setPortalLoading] = useState(false);
@@ -81,25 +82,55 @@ export default function ProfileScreen() {
       <Text variant="caption" muted className="mb-2 uppercase tracking-widest">
         Subscription
       </Text>
-      <Card className="mb-6 gap-1 p-2">
+      <Card className="mb-6 gap-1">
         <Row
           icon={<Sparkles size={18} color={colors.warning} />}
           label="MamaNote Plus"
           right={
             <Text variant="caption" muted>
-              {isPremium()
-                ? `${statusLabel(entitlement?.status ?? 'free')} · ${planLabel(entitlement?.plan)}`
-                : 'Free'}
+              {isComplimentaryPremium()
+                ? `Plus trial · ${complimentaryDaysLeft() ?? 0}d left`
+                : isPremium()
+                  ? `${statusLabel(entitlement?.status ?? 'free')} · ${planLabel(entitlement?.plan)}`
+                  : 'Free'}
             </Text>
           }
-          onPress={isPremium() ? undefined : showPaywall}
         />
-        {isPremium() ? (
+        {hasPaidPremium() ? (
           <Row
             icon={<CreditCard size={18} color={colors.primary} />}
             label={portalLoading ? 'Opening portal…' : 'Manage subscription'}
             onPress={portalLoading ? undefined : handleManageBilling}
           />
+        ) : isComplimentaryPremium() ? (
+          <Pressable
+            onPress={showPaywall}
+            className="mx-3 mb-2 mt-1 rounded-2xl bg-lavender-200 px-4 py-3 active:opacity-90 dark:bg-lavender-200/15"
+          >
+            <View className="flex-row items-center justify-between gap-2">
+              <Text variant="caption" className="shrink font-semibold">
+                Your Plus trial is active
+              </Text>
+              <Text variant="caption" className="font-bold text-red-500 dark:text-red-400">
+                Subscribe now
+              </Text>
+            </View>
+            <Text variant="caption" muted className="mt-0.5">
+              {complimentaryDaysLeft() ?? 0} days left — full access, no card required
+            </Text>
+          </Pressable>
+        ) : isLimitedFree() ? (
+          <Pressable
+            onPress={showPaywall}
+            className="mx-3 mb-2 mt-1 rounded-2xl bg-lavender-200 px-4 py-3 dark:bg-lavender-200/15"
+          >
+            <Text variant="caption" className="font-semibold">
+              Upgrade to MamaNote Plus
+            </Text>
+            <Text variant="caption" muted className="mt-0.5">
+              View all logs · 3 new logs per day · unlimited with Plus
+            </Text>
+          </Pressable>
         ) : (
           <Pressable
             onPress={showPaywall}
@@ -109,7 +140,7 @@ export default function ProfileScreen() {
               Upgrade — unlimited logs, sharing & insights
             </Text>
             <Text variant="caption" muted className="mt-0.5">
-              $39.99/yr with 7-day free trial
+              $39.99/yr — cancel anytime
             </Text>
           </Pressable>
         )}
@@ -170,11 +201,6 @@ export default function ProfileScreen() {
         MamaNote · v1.0.0
       </Text>
 
-      <PaywallSheet
-        visible={paywallVisible}
-        onClose={hidePaywall}
-        onSubscribed={fetchSubscription}
-      />
     </Screen>
   );
 }

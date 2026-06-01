@@ -15,15 +15,13 @@ export const PLANS: Array<{
   price: string;
   sublabel: string;
   badge?: string;
-  trial?: boolean;
 }> = [
   {
     id: 'annual',
     label: 'Annual',
     price: '$39.99/yr',
-    sublabel: '~$3.33/mo · 7-day free trial',
+    sublabel: '~$3.33/mo · Billed yearly',
     badge: 'Best value',
-    trial: true,
   },
   {
     id: 'monthly',
@@ -43,7 +41,6 @@ export const PLUS_FEATURES = [
   'Unlimited activity logs',
   'Multiple baby profiles',
   'Unlimited sharing with family',
-  'Unlimited medicine reminders',
   'Full insights, weekly charts & AI routines',
 ];
 
@@ -53,6 +50,17 @@ export const PADDLE_PRICE_IDS: Record<SubscriptionPlan, string | undefined> = {
   annual: process.env.EXPO_PUBLIC_PADDLE_PRICE_ANNUAL,
   lifetime: process.env.EXPO_PUBLIC_PADDLE_PRICE_LIFETIME,
 };
+
+export function planCheckoutCta(plan: SubscriptionPlan): string {
+  return plan === 'lifetime' ? 'Purchase' : 'Subscribe';
+}
+
+export function planCheckoutFootnote(plan: SubscriptionPlan): string {
+  if (plan === 'lifetime') {
+    return 'Secure checkout opens inside the app.\nOne-time payment — Plus access does not expire.';
+  }
+  return 'Secure checkout opens inside the app.\nCancel anytime from your subscription settings.';
+}
 
 export function planLabel(plan: SubscriptionPlan | null | undefined): string {
   switch (plan) {
@@ -72,7 +80,7 @@ export function statusLabel(status: SubscriptionStatus): string {
     case 'active':
       return 'Active';
     case 'trialing':
-      return 'Free trial';
+      return 'Active';
     case 'canceled':
       return 'Canceled';
     case 'past_due':

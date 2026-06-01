@@ -9,6 +9,8 @@ import { Input } from '@components/Input';
 import { Text } from '@components/Text';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
+import { useSubscriptionStore } from '@store/subscriptionStore';
+import { PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
 import {
   DEFAULT_SCHEDULE,
   loadScheduleForBaby,
@@ -84,7 +86,17 @@ function SelectChip({
 
 export default function SleepScreen() {
   const router = useRouter();
+  const subscriptionLoading = useSubscriptionStore((s) => s.loading);
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
   const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (!isPremium()) {
+      promptPlusUpgrade(PLUS_MESSAGES.sleepHub);
+      router.back();
+    }
+  }, [subscriptionLoading, isPremium, router]);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const entries = useBabyStore((s) => s.entries);
   const addEntry = useBabyStore((s) => s.addEntry);
@@ -338,7 +350,7 @@ export default function SleepScreen() {
                   </View>
                   <View className="flex-1">
                     <Text className="text-base font-bold text-white">Start night sleep</Text>
-                    <Text variant="caption" className="text-indigo-200">
+                    <Text variant="caption" className="text-white">
                       For bedtime / overnight
                     </Text>
                   </View>

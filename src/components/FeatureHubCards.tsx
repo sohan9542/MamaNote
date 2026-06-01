@@ -4,15 +4,26 @@ import { useRouter } from 'expo-router';
 
 import { Text } from './Text';
 import { useTheme } from '@hooks/useTheme';
+import { PLUS_MESSAGES, requirePlus } from '@utils/plusUpgrade';
 
 export function FeatureHubCards() {
   const router = useRouter();
   const { isDark } = useTheme();
 
+  const openGrowth = () => {
+    if (!requirePlus(PLUS_MESSAGES.growthSkills)) return;
+    router.push('/growth-skills');
+  };
+
+  const openSleep = () => {
+    if (!requirePlus(PLUS_MESSAGES.sleepHub)) return;
+    router.push('/sleep');
+  };
+
   return (
     <View className="mb-6 flex-row gap-3">
       <Pressable
-        onPress={() => router.push('/growth-skills')}
+        onPress={openGrowth}
         className="flex-1 overflow-hidden rounded-3xl active:opacity-90"
         style={{
           backgroundColor: isDark ? '#6D28D9' : '#8B5CF6',
@@ -35,7 +46,7 @@ export function FeatureHubCards() {
       </Pressable>
 
       <Pressable
-        onPress={() => router.push('/sleep')}
+        onPress={openSleep}
         className="flex-1 overflow-hidden rounded-3xl active:opacity-90"
         style={{
           backgroundColor: isDark ? '#312E81' : '#6366F1',

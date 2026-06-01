@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSubscriptionStore } from '@store/subscriptionStore';
+import { PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
 import {
   FlatList,
   Pressable,
@@ -32,7 +34,17 @@ const TOTAL_SKILLS = MILESTONES.reduce((sum, m) => sum + m.skills.length, 0);
 
 export default function GrowthSkillsScreen() {
   const router = useRouter();
+  const subscriptionLoading = useSubscriptionStore((s) => s.loading);
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
   const babies = useBabyStore((s) => s.babies);
+
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (!isPremium()) {
+      promptPlusUpgrade(PLUS_MESSAGES.growthSkills);
+      router.back();
+    }
+  }, [subscriptionLoading, isPremium, router]);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const activeBaby = babies.find((b) => b.id === activeBabyId) ?? babies[0] ?? null;
 

@@ -185,6 +185,7 @@ export interface Database {
           paddle_subscription_id: string | null;
           free_ai_generations_used: number;
           current_period_end: string | null;
+          complimentary_premium_until: string | null;
           updated_at: string;
         };
         Insert: {
@@ -196,6 +197,7 @@ export interface Database {
           paddle_subscription_id?: string | null;
           free_ai_generations_used?: number;
           current_period_end?: string | null;
+          complimentary_premium_until?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -207,6 +209,7 @@ export interface Database {
           paddle_subscription_id?: string | null;
           free_ai_generations_used?: number;
           current_period_end?: string | null;
+          complimentary_premium_until?: string | null;
           updated_at?: string;
         };
       };

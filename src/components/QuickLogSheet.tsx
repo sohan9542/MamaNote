@@ -47,7 +47,7 @@ export function QuickLogSheet({ activity, visible, onClose, onSaved }: Props) {
                 {activity.label}
               </Text>
               <Text variant="caption" muted>
-                Log activity
+                {activity.id === 'sleep' ? 'Log sleep' : 'Log activity'}
               </Text>
             </View>
             <Pressable

@@ -7,6 +7,7 @@ import { Trash2, X } from 'lucide-react-native';
 import { Button } from './Button';
 import { Input } from './Input';
 import { OptionChip } from './OptionChip';
+import { SleepLogFields } from './SleepLogFields';
 import { Text } from './Text';
 import { getActivityForEntry } from '@constants/activities';
 import type { LogMetadata } from '@constants/logFields';
@@ -18,11 +19,9 @@ import {
 } from '@lib/notifications';
 import { useBabyStore } from '@store/babyStore';
 import { useMedicineReminderStore } from '@store/medicineReminderStore';
-import { useSubscriptionStore } from '@store/subscriptionStore';
-import { assertCanAddMedicineReminder } from '@lib/freemium';
-import { handleFreemiumError } from '@utils/freemiumError';
 import { entryDetailLine, entryDisplayTitle } from '@utils/baby';
 import { formatDate, formatTime } from '@utils/date';
+import { initialSleepLogState, resolveSleepEntryTimes, type SleepLogState } from '@utils/sleepLog';
 import { formatMedicineTime } from '@utils/medicineTime';
 import {
   findMatchingRemindersForMedicine,
@@ -37,14 +36,6 @@ const DIAPER_OPTIONS: { label: string; subtype: LogMetadata['subtype'] }[] = [
   { label: 'Wet', subtype: 'wet' },
   { label: 'Dirty', subtype: 'dirty' },
   { label: 'Wet & Dirty', subtype: 'both' },
-];
-
-const SLEEP_DURATIONS = [
-  { label: '30m', minutes: 30 },
-  { label: '1h', minutes: 60 },
-  { label: '1.5h', minutes: 90 },
-  { label: '2h', minutes: 120 },
-  { label: '10h', minutes: 600 },
 ];
 
 interface Props {
@@ -73,14 +64,13 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
     (s) => s.deleteRemindersForMedicine,
   );
   const saveReminder = useMedicineReminderStore((s) => s.saveReminder);
-  const remindersByBaby = useMedicineReminderStore((s) => s.remindersByBaby);
-  const isPremium = useSubscriptionStore((s) => s.isPremium);
 
   const [metadata, setMetadata] = useState<LogMetadata>({});
   const [amount, setAmount] = useState('');
   const [temperature, setTemperature] = useState('');
   const [notes, setNotes] = useState('');
   const [medicineName, setMedicineName] = useState('');
+  const [sleepLog, setSleepLog] = useState<SleepLogState>(() => initialSleepLogState());
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [togglingReminder, setTogglingReminder] = useState(false);
@@ -93,6 +83,15 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
     setTemperature(meta.temperature != null ? String(meta.temperature) : '');
     setNotes(entry.notes ?? '');
     setMedicineName(entry.notes ?? meta.medicineName ?? '');
+    if (entry.type === 'sleep') {
+      setSleepLog(
+        initialSleepLogState({
+          started_at: entry.started_at,
+          ended_at: entry.ended_at,
+          metadata: meta,
+        }),
+      );
+    }
   }, [entry?.id]);
 
   const activity = entry ? getActivityForEntry(entry.type, entry.metadata as LogMetadata) : null;
@@ -150,13 +149,31 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
       return;
     }
 
+    let startedAt = entry.started_at;
+    let endedAt: string | null = buildEndedAt(entry.started_at, finalMeta.durationMinutes);
+
+    if (isSleep) {
+      const resolved = resolveSleepEntryTimes(sleepLog, {
+        referenceDay: new Date(entry.started_at),
+        endAt: entry.ended_at ? new Date(entry.ended_at) : undefined,
+      });
+      if ('error' in resolved) {
+        Alert.alert('Sleep log', resolved.error);
+        return;
+      }
+      startedAt = resolved.started_at;
+      endedAt = resolved.ended_at;
+      finalMeta.durationMinutes = resolved.durationMinutes;
+    }
+
     setSaving(true);
     try {
       await updateEntry(entry.id, {
         amount: amount ? Number(amount) : null,
         unit: showAmount && amount ? 'ml' : entry.unit,
         notes: isMedicine ? medicineName.trim() : notes || null,
-        ended_at: buildEndedAt(entry.started_at, finalMeta.durationMinutes),
+        started_at: startedAt,
+        ended_at: endedAt,
         metadata:
           Object.keys(finalMeta).length > 0
             ? ({
@@ -232,15 +249,6 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
 
     setTogglingReminder(true);
     try {
-      if (enabled) {
-        for (const reminder of matchingReminders) {
-          assertCanAddMedicineReminder(remindersByBaby, isPremium(), {
-            excludeReminderId: reminder.id,
-            isUpdate: true,
-          });
-        }
-      }
-
       await Promise.all(
         matchingReminders.map((reminder) =>
           saveReminder({
@@ -253,7 +261,6 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onUpdated();
     } catch (error) {
-      if (handleFreemiumError(error)) return;
       Alert.alert('Could not update reminder', (error as Error).message);
     } finally {
       setTogglingReminder(false);
@@ -382,23 +389,7 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
                 </>
               )}
 
-              {isSleep && (
-                <View className="gap-2">
-                  <Text variant="caption" className="font-medium">
-                    Duration
-                  </Text>
-                  <View className="flex-row flex-wrap gap-2">
-                    {SLEEP_DURATIONS.map((d) => (
-                      <OptionChip
-                        key={d.minutes}
-                        label={d.label}
-                        selected={metadata.durationMinutes === d.minutes}
-                        onPress={() => setMetadata((m) => ({ ...m, durationMinutes: d.minutes }))}
-                      />
-                    ))}
-                  </View>
-                </View>
-              )}
+              {isSleep && <SleepLogFields value={sleepLog} onChange={setSleepLog} />}
 
               {showAmount && (
                 <Input

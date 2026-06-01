@@ -12,7 +12,6 @@ import { StatsEntriesSheet } from '@components/StatsEntriesSheet';
 import { Text } from '@components/Text';
 import { WeeklyAreaChart } from '@components/WeeklyAreaChart';
 import { getActivityById } from '@constants/activities';
-import { FREE_DAILY_LOG_LIMIT } from '@constants/freemium';
 import { countTodayLogsFromEntries } from '@lib/freemium';
 import { PremiumRequiredError } from '@lib/schedule';
 import { useBabyStore } from '@store/babyStore';
@@ -50,6 +49,8 @@ export default function StatsScreen() {
   const clearPremiumRequired = useScheduleStore((s) => s.clearPremiumRequired);
 
   const isPremium = useSubscriptionStore((s) => s.isPremium);
+  const isLimitedFree = useSubscriptionStore((s) => s.isLimitedFree);
+  const getDailyLogLimit = useSubscriptionStore((s) => s.getDailyLogLimit);
   const canGenerateAi = useSubscriptionStore((s) => s.canGenerateAi);
 
   const [chartPeriod, setChartPeriod] = useState<StatsChartPeriod>('7d');
@@ -160,7 +161,9 @@ export default function StatsScreen() {
       <Text muted className="mb-6">
         {isPremium()
           ? 'Tap any chart to see the activities behind it.'
-          : 'Explore everything — some features need MamaNote Plus after free limits.'}
+          : isLimitedFree()
+            ? 'View your history and daily counts — drill-downs and AI need MamaNote Plus.'
+            : 'Explore everything — some features need MamaNote Plus.'}
       </Text>
 
       <Card tone="lavender" className="mb-6 gap-3">
@@ -212,7 +215,8 @@ export default function StatsScreen() {
         </Text>
         {!isPremium() && activeBabyId ? (
           <Text variant="caption" muted>
-            {todayLogCount}/{FREE_DAILY_LOG_LIMIT} logs today
+            {todayLogCount}/
+            {Number.isFinite(getDailyLogLimit()) ? getDailyLogLimit() : '∞'} logs today
           </Text>
         ) : null}
       </View>

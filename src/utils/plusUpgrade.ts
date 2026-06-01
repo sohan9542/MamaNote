@@ -38,5 +38,13 @@ export const PLUS_MESSAGES = {
   addBaby:
     'Multiple baby profiles are included with MamaNote Plus.',
   share:
-    'You have used your free share link for this week. Upgrade for unlimited sharing with family.',
+    'Sharing activity links with family is part of MamaNote Plus.',
+  growthSkills:
+    'Growth & skills tracking is part of MamaNote Plus.',
+  sleepHub:
+    'Sleep timer and schedules are part of MamaNote Plus.',
+  medicineReminders:
+    'Medicine reminders are included with MamaNote Plus.',
+  routinePreview:
+    'AI daily rhythms are part of MamaNote Plus.',
 } as const;

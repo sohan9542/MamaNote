@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Share2 } from 'lucide-react-native';
@@ -15,6 +15,7 @@ import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import { handleFreemiumError } from '@utils/freemiumError';
+import { PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
 import type { ActivityShare } from '@app-types/share';
 import {
   filterEntriesForShare,
@@ -23,7 +24,17 @@ import {
 
 export default function ShareActivitiesScreen() {
   const router = useRouter();
+  const subscriptionLoading = useSubscriptionStore((s) => s.loading);
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
   const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (!isPremium()) {
+      promptPlusUpgrade(PLUS_MESSAGES.share);
+      router.back();
+    }
+  }, [subscriptionLoading, isPremium, router]);
   const babies = useBabyStore((s) => s.babies);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const entries = useBabyStore((s) => s.entries);
@@ -71,7 +82,10 @@ export default function ShareActivitiesScreen() {
 
     setCreating(true);
     try {
-      await assertCanCreateShare(user.id, useSubscriptionStore.getState().isPremium());
+      await assertCanCreateShare(
+        user.id,
+        useSubscriptionStore.getState().getFreemiumAccess(),
+      );
       const created = await createActivityShare({
         babyId: activeBaby.id,
         userId: user.id,
