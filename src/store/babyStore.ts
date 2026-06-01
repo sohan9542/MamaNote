@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 
 import { supabase } from '@lib/supabase';
@@ -13,6 +14,27 @@ import type {
 
 type LogEntryInsert = Database['public']['Tables']['log_entries']['Insert'];
 
+const ACTIVE_BABY_KEY = '@mamanote/active-baby-id';
+
+async function readActiveBabyId(): Promise<string | null> {
+  return AsyncStorage.getItem(ACTIVE_BABY_KEY);
+}
+
+async function writeActiveBabyId(id: string | null) {
+  if (id) await AsyncStorage.setItem(ACTIVE_BABY_KEY, id);
+  else await AsyncStorage.removeItem(ACTIVE_BABY_KEY);
+}
+
+function resolveActiveBabyId(
+  babies: Baby[],
+  preferredId: string | null | undefined,
+): string | null {
+  if (preferredId && babies.some((baby) => baby.id === preferredId)) {
+    return preferredId;
+  }
+  return babies[0]?.id ?? null;
+}
+
 interface BabyState {
   babies: Baby[];
   activeBabyId: string | null;
@@ -22,6 +44,7 @@ interface BabyState {
   error: string | null;
 
   setActiveBaby: (id: string) => void;
+  selectBaby: (id: string) => Promise<void>;
   fetchBabies: () => Promise<void>;
   createBaby: (payload: {
     userId: string;
@@ -46,7 +69,19 @@ export const useBabyStore = create<BabyState>((set, get) => ({
   babiesInitialized: false,
   error: null,
 
-  setActiveBaby: (id) => set({ activeBabyId: id }),
+  setActiveBaby: (id) => {
+    void writeActiveBabyId(id);
+    set({ activeBabyId: id });
+  },
+
+  selectBaby: async (id) => {
+    const { babies, activeBabyId } = get();
+    if (!babies.some((baby) => baby.id === id) || activeBabyId === id) return;
+
+    void writeActiveBabyId(id);
+    set({ activeBabyId: id, entries: [] });
+    await get().fetchEntries(id);
+  },
 
   createBaby: async ({ userId, name, birthDate, gender }) => {
     const isPremium = useSubscriptionStore.getState().isPremium();
@@ -70,11 +105,14 @@ export const useBabyStore = create<BabyState>((set, get) => ({
     }
 
     const baby = data as Baby;
+    await writeActiveBabyId(baby.id);
     set({
       babies: [...get().babies, baby],
       activeBabyId: baby.id,
+      entries: [],
       loading: false,
     });
+    await get().fetchEntries(baby.id);
     return baby;
   },
 
@@ -91,9 +129,19 @@ export const useBabyStore = create<BabyState>((set, get) => ({
     }
 
     const babies = (data ?? []) as Baby[];
+    const storedActiveId = await readActiveBabyId();
+    const activeBabyId = resolveActiveBabyId(
+      babies,
+      storedActiveId ?? get().activeBabyId,
+    );
+
+    if (activeBabyId !== storedActiveId) {
+      await writeActiveBabyId(activeBabyId);
+    }
+
     set({
       babies,
-      activeBabyId: get().activeBabyId ?? babies[0]?.id ?? null,
+      activeBabyId,
       loading: false,
       babiesInitialized: true,
     });

@@ -114,7 +114,8 @@ export function LogActivityForm({
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onSaved?.();
     } catch (error) {
-      Alert.alert('Could not save', handleFreemiumError(error));
+      if (handleFreemiumError(error)) return;
+      Alert.alert('Could not save', (error as Error).message);
     } finally {
       setSubmitting(false);
     }

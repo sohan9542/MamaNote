@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { Baby as BabyIcon, Star } from 'lucide-react-native';
 
 import { Text } from './Text';
 import { babyAge, lastFeedLabel } from '@utils/date';
@@ -27,8 +27,10 @@ export function BabyProfileCard({ baby, lastFeedAt }: Props) {
       }}
     >
       <View className="flex-row items-center gap-4">
-        <View className="h-20 w-20 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-100/15">
-          <Text className="text-4xl">👶</Text>
+        <View className="h-20 w-20 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-500/20">
+          <View className="h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm dark:bg-ink-800/90">
+            <BabyIcon size={32} color="#FB7185" strokeWidth={2} />
+          </View>
         </View>
         <View className="flex-1">
           <View className="flex-row items-center gap-2">

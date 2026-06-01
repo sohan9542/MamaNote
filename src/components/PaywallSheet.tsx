@@ -69,9 +69,7 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
                   <Text variant="subtitle" className="font-bold">
                     MamaNote Plus
                   </Text>
-                  <Text variant="caption" muted>
-                    Unlimited logging, sharing, reminders & AI insights
-                  </Text>
+               
                 </View>
               </View>
               <Pressable

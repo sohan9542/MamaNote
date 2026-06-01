@@ -255,6 +255,7 @@ function ThemedShell() {
         <Stack.Screen name="feedback" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="privacy" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="add-baby" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
       <PaywallSheet

@@ -1,8 +1,9 @@
 import type { LucideIcon } from 'lucide-react-native';
 import {
   Apple,
-  Baby,
   Droplet,
+  Layers,
+  Milk,
   Moon,
   Stethoscope,
   Thermometer,
@@ -38,7 +39,7 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
     id: 'breastfeeding',
     type: 'feeding',
     label: 'Breastfeeding',
-    icon: Baby,
+    icon: Milk,
     bg: '#FFEDD5',
     iconColor: '#EA580C',
     defaultMetadata: { subtype: 'breastfeeding' },
@@ -72,7 +73,7 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
     id: 'diaper',
     type: 'diaper',
     label: 'Diaper',
-    icon: Baby,
+    icon: Layers,
     bg: '#DCFCE7',
     iconColor: '#16A34A',
     instantLog: true,

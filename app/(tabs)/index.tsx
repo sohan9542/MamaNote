@@ -5,6 +5,7 @@ import { Bell, Share2 } from 'lucide-react-native';
 
 import { ActivityCard } from '@components/ActivityCard';
 import { BabyProfileCard } from '@components/BabyProfileCard';
+import { BabySwitcher } from '@components/BabySwitcher';
 import { LogEntryDetailSheet } from '@components/LogEntryDetailSheet';
 import { LogEntryRow } from '@components/LogEntryRow';
 import { MedicineSheet } from '@components/MedicineSheet';
@@ -91,7 +92,10 @@ export default function HomeScreen() {
       </View>
 
       {activeBaby ? (
-        <BabyProfileCard baby={activeBaby} lastFeedAt={lastFeed?.started_at ?? null} />
+        <>
+          <BabySwitcher />
+          <BabyProfileCard baby={activeBaby} lastFeedAt={lastFeed?.started_at ?? null} />
+        </>
       ) : (
         <View className="mb-6 rounded-3xl border border-dashed border-pink-200 bg-pink-50 p-6 dark:border-ink-600 dark:bg-ink-700">
           <Text variant="subtitle">Add your baby</Text>

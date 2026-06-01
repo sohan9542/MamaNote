@@ -6,20 +6,20 @@ import { Sparkles } from 'lucide-react-native';
 import { ActivityMiniChart } from '@components/ActivityMiniChart';
 import { Button } from '@components/Button';
 import { Card } from '@components/Card';
-import { LockedInsightCard } from '@components/LockedInsightCard';
 import { RoutinePreviewCard } from '@components/RoutinePreviewCard';
 import { Screen } from '@components/Screen';
 import { StatsEntriesSheet } from '@components/StatsEntriesSheet';
 import { Text } from '@components/Text';
 import { WeeklyRoutineChart } from '@components/WeeklyRoutineChart';
 import { getActivityById } from '@constants/activities';
+import { FREE_DAILY_LOG_LIMIT } from '@constants/freemium';
 import { countTodayLogsFromEntries } from '@lib/freemium';
 import { PremiumRequiredError } from '@lib/schedule';
-import { FREE_DAILY_LOG_LIMIT } from '@constants/freemium';
 import { useBabyStore } from '@store/babyStore';
 import { useScheduleStore } from '@store/scheduleStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import { countTodayForActivity } from '@utils/baby';
+import { PLUS_MESSAGES, promptPlusUpgrade, requirePlus } from '@utils/plusUpgrade';
 import {
   buildActivityMiniCharts,
   buildWeeklyChartData,
@@ -45,11 +45,10 @@ export default function StatsScreen() {
   const fetchLatest = useScheduleStore((s) => s.fetchLatest);
   const generate = useScheduleStore((s) => s.generate);
   const premiumRequired = useScheduleStore((s) => s.premiumRequired);
+  const clearPremiumRequired = useScheduleStore((s) => s.clearPremiumRequired);
 
   const isPremium = useSubscriptionStore((s) => s.isPremium);
   const canGenerateAi = useSubscriptionStore((s) => s.canGenerateAi);
-  const showPaywall = useSubscriptionStore((s) => s.showPaywall);
-  const fetchSubscription = useSubscriptionStore((s) => s.fetch);
 
   const [periodDays] = useState(7);
   const [sheetFilter, setSheetFilter] = useState<StatsFilter | null>(null);
@@ -79,10 +78,7 @@ export default function StatsScreen() {
   );
 
   const openSheet = (filter: StatsFilter) => {
-    if (!isPremium()) {
-      showPaywall();
-      return;
-    }
+    if (!requirePlus(PLUS_MESSAGES.weeklyInsights)) return;
     setSheetFilter(filter);
   };
   const closeSheet = () => setSheetFilter(null);
@@ -96,12 +92,14 @@ export default function StatsScreen() {
 
   useEffect(() => {
     load();
-    fetchSubscription();
-  }, [load, fetchSubscription]);
+  }, [load]);
 
   useEffect(() => {
-    if (premiumRequired) showPaywall();
-  }, [premiumRequired, showPaywall]);
+    if (premiumRequired) {
+      promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
+      clearPremiumRequired();
+    }
+  }, [premiumRequired, clearPremiumRequired]);
 
   const handleGenerate = async () => {
     if (!activeBabyId) {
@@ -116,23 +114,25 @@ export default function StatsScreen() {
       return;
     }
     if (!canGenerateAi()) {
-      showPaywall();
+      promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
       return;
     }
     try {
       await generate(activeBabyId, periodDays);
-      await fetchSubscription();
       router.push('/routine');
     } catch (e) {
       if (e instanceof PremiumRequiredError) {
-        showPaywall();
+        promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
         return;
       }
       Alert.alert('Could not generate routine', (e as Error).message);
     }
   };
 
-  const openRoutine = () => router.push('/routine');
+  const openRoutine = () => {
+    if (!requirePlus(PLUS_MESSAGES.generateRoutine)) return;
+    router.push('/routine');
+  };
 
   const handleBlockPress = (block: ChartBlock) => {
     openSheet({ entryId: block.entryId });
@@ -140,6 +140,10 @@ export default function StatsScreen() {
 
   const handleDayPress = (day: DayChartData) => {
     openSheet({ dateKey: day.dateKey });
+  };
+
+  const handleChartPress = (activityId: string) => {
+    openSheet({ activityId, dayCount: periodDays });
   };
 
   return (
@@ -150,59 +154,51 @@ export default function StatsScreen() {
       <Text muted className="mb-6">
         {isPremium()
           ? 'Tap any chart to see the activities behind it.'
-          : 'Daily counts are free. Upgrade for weekly charts, drill-downs, and AI routines.'}
+          : 'Explore everything — some features need MamaNote Plus after free limits.'}
       </Text>
 
-      {!isPremium() ? (
-        <LockedInsightCard
-          title="Today's rhythm & AI routines"
-          description="MamaNote Plus turns your logs into a personalized daily schedule and lets you regenerate anytime."
-          onUpgrade={showPaywall}
-        />
-      ) : (
-        <Card tone="lavender" className="mb-6 gap-3">
-          <View className="flex-row items-start gap-3">
-            <View className="h-10 w-10 items-center justify-center rounded-full bg-lavender-300/40">
-              <Sparkles size={20} color="#7C3AED" />
-            </View>
-            <View className="flex-1">
-              <Text variant="subtitle" className="font-bold">
-                Today&apos;s rhythm
-              </Text>
-              <Text variant="caption" muted className="mt-1">
-                {activeBaby
-                  ? `AI maps ${activeBaby.name}'s week into a simple daily schedule.`
-                  : 'Add your baby to generate a schedule.'}
-              </Text>
-            </View>
+      <Card tone="lavender" className="mb-6 gap-3">
+        <View className="flex-row items-start gap-3">
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-lavender-300/40">
+            <Sparkles size={20} color="#7C3AED" />
           </View>
-
-          {routine ? (
-            <View className="gap-3">
-              <RoutinePreviewCard routine={routine} onPress={openRoutine} />
-              <Button variant="secondary" onPress={openRoutine} fullWidth>
-                View full routine
-              </Button>
-            </View>
-          ) : null}
-
-          <Button
-            onPress={handleGenerate}
-            loading={generating}
-            disabled={!activeBabyId}
-            fullWidth
-            leftIcon={<Sparkles size={18} color="#fff" />}
-          >
-            {routine ? 'Regenerate' : '✨ Generate'}
-          </Button>
-
-          {routineError ? (
-            <Text variant="caption" className="text-pink-500">
-              {routineError}
+          <View className="flex-1">
+            <Text variant="subtitle" className="font-bold">
+              Today&apos;s rhythm
             </Text>
-          ) : null}
-        </Card>
-      )}
+            <Text variant="caption" muted className="mt-1">
+              {activeBaby
+                ? `AI maps ${activeBaby.name}'s week into a simple daily schedule.`
+                : 'Add your baby to generate a schedule.'}
+            </Text>
+          </View>
+        </View>
+
+        {routine && isPremium() ? (
+          <View className="gap-3">
+            <RoutinePreviewCard routine={routine} onPress={openRoutine} />
+            <Button variant="secondary" onPress={openRoutine} fullWidth>
+              View full routine
+            </Button>
+          </View>
+        ) : null}
+
+        <Button
+          onPress={handleGenerate}
+          loading={generating}
+          disabled={!activeBabyId}
+          fullWidth
+          leftIcon={<Sparkles size={18} color="#fff" />}
+        >
+          {routine && isPremium() ? 'Regenerate' : '✨ Generate'}
+        </Button>
+
+        {routineError ? (
+          <Text variant="caption" className="text-pink-500">
+            {routineError}
+          </Text>
+        ) : null}
+      </Card>
 
       <View className="mb-2 flex-row items-center justify-between">
         <Text variant="subtitle" className="font-bold">
@@ -223,34 +219,20 @@ export default function StatsScreen() {
               key={chart.activityId}
               data={chart}
               todayCount={todayCount}
-              onPress={
-                isPremium()
-                  ? (activityId) => openSheet({ activityId, dayCount: periodDays })
-                  : showPaywall
-              }
+              onPress={handleChartPress}
             />
           );
         })}
       </View>
 
-      {isPremium() ? (
-        <View className="mb-6">
-          <WeeklyRoutineChart
-            data={weeklyData}
-            title={`${periodDays} days`}
-            onBlockPress={handleBlockPress}
-            onDayPress={handleDayPress}
-          />
-        </View>
-      ) : (
-        <View className="mb-6">
-          <LockedInsightCard
-            title="Weekly overview"
-            description="See patterns across the full week and tap any day to explore activities."
-            onUpgrade={showPaywall}
-          />
-        </View>
-      )}
+      <View className="mb-6">
+        <WeeklyRoutineChart
+          data={weeklyData}
+          title={`${periodDays} days`}
+          onBlockPress={handleBlockPress}
+          onDayPress={handleDayPress}
+        />
+      </View>
 
       <StatsEntriesSheet
         visible={sheetFilter != null}

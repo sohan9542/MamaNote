@@ -80,7 +80,8 @@ export default function ShareActivitiesScreen() {
       });
       setShare(created);
     } catch (error) {
-      Alert.alert('Could not create link', handleFreemiumError(error));
+      if (handleFreemiumError(error)) return;
+      Alert.alert('Could not create link', (error as Error).message);
     } finally {
       setCreating(false);
     }

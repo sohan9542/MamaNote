@@ -253,7 +253,8 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onUpdated();
     } catch (error) {
-      Alert.alert('Could not update reminder', handleFreemiumError(error));
+      if (handleFreemiumError(error)) return;
+      Alert.alert('Could not update reminder', (error as Error).message);
     } finally {
       setTogglingReminder(false);
     }

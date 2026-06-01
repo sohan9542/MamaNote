@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react-native';
 
+import { BabyManagerCard } from '@components/BabyManagerCard';
 import { Button } from '@components/Button';
 import { Card } from '@components/Card';
 import { PaywallSheet } from '@components/PaywallSheet';
@@ -113,6 +114,11 @@ export default function ProfileScreen() {
           </Pressable>
         )}
       </Card>
+
+      <Text variant="caption" muted className="mb-2 uppercase tracking-widest">
+        Your babies
+      </Text>
+      <BabyManagerCard />
 
       <Text variant="caption" muted className="mb-2 uppercase tracking-widest">
         Preferences

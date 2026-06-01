@@ -1,10 +1,3 @@
-import { FreemiumLimitError } from '@lib/freemium';
-import { useSubscriptionStore } from '@store/subscriptionStore';
+import { handleFreemiumError } from '@utils/plusUpgrade';
 
-export function handleFreemiumError(error: unknown, fallbackMessage = 'Something went wrong') {
-  if (error instanceof FreemiumLimitError) {
-    useSubscriptionStore.getState().showPaywall();
-    return error.message;
-  }
-  return error instanceof Error ? error.message : fallbackMessage;
-}
+export { handleFreemiumError, promptPlusUpgrade, requirePlus, PLUS_MESSAGES } from '@utils/plusUpgrade';

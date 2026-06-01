@@ -10,6 +10,7 @@ import { RoutineSourceBadge } from '@components/RoutineSourceBadge';
 import { RoutineTimelineChart } from '@components/RoutineTimelineChart';
 import { Screen } from '@components/Screen';
 import { Text } from '@components/Text';
+import { PLUS_MESSAGES, promptPlusUpgrade, requirePlus } from '@utils/plusUpgrade';
 import { PremiumRequiredError } from '@lib/schedule';
 import { useBabyStore } from '@store/babyStore';
 import { useScheduleStore } from '@store/scheduleStore';
@@ -30,9 +31,7 @@ export default function RoutineScreen() {
   const fetchLatest = useScheduleStore((s) => s.fetchLatest);
   const generate = useScheduleStore((s) => s.generate);
 
-  const canGenerateAi = useSubscriptionStore((s) => s.canGenerateAi);
   const paywallVisible = useSubscriptionStore((s) => s.paywallVisible);
-  const showPaywall = useSubscriptionStore((s) => s.showPaywall);
   const hidePaywall = useSubscriptionStore((s) => s.hidePaywall);
   const fetchSubscription = useSubscriptionStore((s) => s.fetch);
 
@@ -47,20 +46,22 @@ export default function RoutineScreen() {
   }, [load]);
 
   useEffect(() => {
-    if (premiumRequired) showPaywall();
-  }, [premiumRequired, showPaywall]);
+    if (premiumRequired) {
+      promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
+      clearPremiumRequired();
+    }
+  }, [premiumRequired, clearPremiumRequired]);
 
   const handleRefresh = async () => {
     if (!activeBabyId) return;
-    if (!canGenerateAi()) {
-      showPaywall();
-      return;
-    }
+    if (!requirePlus(PLUS_MESSAGES.generateRoutine)) return;
     try {
       await generate(activeBabyId, 7);
       await fetchSubscription();
     } catch (e) {
-      if (e instanceof PremiumRequiredError) showPaywall();
+      if (e instanceof PremiumRequiredError) {
+        promptPlusUpgrade(PLUS_MESSAGES.generateRoutine);
+      }
     }
   };
 
