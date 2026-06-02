@@ -15,8 +15,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "assets:placeholder": "node scripts/generate-assets.js",
-    "assets:brand": "node scripts/generate-brand-assets.js",
-    "postinstall": "node scripts/generate-assets.js"
+    "assets:brand": "node scripts/generate-brand-assets.js"
   },
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",

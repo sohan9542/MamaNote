@@ -42,7 +42,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FECF9B"
+        "backgroundColor": "#FF6077"
       }
     },
     "web": {
@@ -61,9 +61,9 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 260,
           "resizeMode": "contain",
-          "backgroundColor": "#FFF1F2",
+          "backgroundColor": "#FF6077",
           "dark": {
-            "backgroundColor": "#1A1625"
+            "backgroundColor": "#FF6077"
           }
         }
       ],
@@ -90,6 +90,6 @@
         "projectId": "7ea3ec20-3c02-42f5-aeb4-1368519c28a8"
       }
     },
-    "owner": "mamnote"
+    "owner": "mamanote"
   }
 }

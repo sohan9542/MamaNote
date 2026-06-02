@@ -32,7 +32,5 @@ for (const file of files) {
   }
 }
 
-const mainLogo = path.join(assetsDir, 'mainlogo.png');
-if (fs.existsSync(mainLogo)) {
-  require('./generate-brand-assets.js');
-}
+// Intentionally do not auto-generate brand assets here.
+// Team can run `npm run assets:brand` manually when needed.
