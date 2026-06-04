@@ -30,6 +30,9 @@ export function getLastEntryForActivity(
   return (
     entries.find((e) => {
       if (e.type !== activity.type) return false;
+      if (activity.id === 'notes') {
+        return !entryMeta(e).subtype;
+      }
       if (meta?.subtype) {
         return entryMeta(e).subtype === meta.subtype;
       }
@@ -51,6 +54,9 @@ export function countTodayForActivity(
       d.getFullYear() === today.getFullYear();
     if (!isToday) return false;
     if (e.type !== activity.type) return false;
+    if (activity.id === 'notes') {
+      return !entryMeta(e).subtype;
+    }
     if (activity.defaultMetadata?.subtype) {
       return entryMeta(e).subtype === activity.defaultMetadata.subtype;
     }

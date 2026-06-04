@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sparkles } from 'lucide-react-native';
 
@@ -11,13 +11,13 @@ import { Screen } from '@components/Screen';
 import { StatsEntriesSheet } from '@components/StatsEntriesSheet';
 import { Text } from '@components/Text';
 import { WeeklyAreaChart } from '@components/WeeklyAreaChart';
-import { getActivityById } from '@constants/activities';
 import { countTodayLogsFromEntries } from '@lib/freemium';
 import { PremiumRequiredError } from '@lib/schedule';
+import { useTheme } from '@hooks/useTheme';
 import { useBabyStore } from '@store/babyStore';
 import { useScheduleStore } from '@store/scheduleStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
-import { countTodayForActivity } from '@utils/baby';
+import { cn } from '@utils/cn';
 import { PLUS_MESSAGES, promptPlusUpgrade, requirePlus } from '@utils/plusUpgrade';
 import {
   buildActivityMiniCharts,
@@ -33,8 +33,17 @@ import {
   type StatsFilter,
 } from '@utils/statsFilter';
 
+export type StatsActivityPeriod = 'weekly' | 'monthly';
+
+const STATS_PERIODS: { id: StatsActivityPeriod; label: string; days: number; caption: string }[] =
+  [
+    { id: 'weekly', label: 'Weekly', days: 7, caption: 'this week' },
+    { id: 'monthly', label: 'Monthly', days: 30, caption: 'this month' },
+  ];
+
 export default function StatsScreen() {
   const router = useRouter();
+  const { isDark, colors } = useTheme();
   const babies = useBabyStore((s) => s.babies);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const entries = useBabyStore((s) => s.entries);
@@ -54,10 +63,14 @@ export default function StatsScreen() {
   const canGenerateAi = useSubscriptionStore((s) => s.canGenerateAi);
 
   const [chartPeriod, setChartPeriod] = useState<StatsChartPeriod>('7d');
+  const [statsPeriod, setStatsPeriod] = useState<StatsActivityPeriod>('weekly');
   const [sheetFilter, setSheetFilter] = useState<StatsFilter | null>(null);
 
-  const periodDays =
-    chartPeriod === '30d' ? 30 : chartPeriod === 'all' ? 30 : 7;
+  const statsPeriodConfig =
+    STATS_PERIODS.find((p) => p.id === statsPeriod) ?? STATS_PERIODS[0];
+  const statsPeriodDays = statsPeriodConfig.days;
+
+  const routinePeriodDays = 7;
 
   const activeBaby = babies.find((b) => b.id === activeBabyId) ?? babies[0] ?? null;
 
@@ -67,8 +80,8 @@ export default function StatsScreen() {
   );
 
   const activityCharts = useMemo(
-    () => buildActivityMiniCharts(entries, periodDays),
-    [entries, periodDays],
+    () => buildActivityMiniCharts(entries, statsPeriodDays),
+    [entries, statsPeriodDays],
   );
 
   const sheetEntries = useMemo(
@@ -124,7 +137,7 @@ export default function StatsScreen() {
       return;
     }
     try {
-      await generate(activeBabyId, periodDays);
+      await generate(activeBabyId, routinePeriodDays);
       router.push('/routine');
     } catch (e) {
       if (e instanceof PremiumRequiredError) {
@@ -150,7 +163,7 @@ export default function StatsScreen() {
   };
 
   const handleChartPress = (activityId: string) => {
-    openSheet({ activityId, dayCount: periodDays });
+    openSheet({ activityId, dayCount: statsPeriodDays });
   };
 
   return (
@@ -168,8 +181,8 @@ export default function StatsScreen() {
 
       <Card tone="lavender" className="mb-6 gap-3">
         <View className="flex-row items-start gap-3">
-          <View className="h-10 w-10 items-center justify-center rounded-full bg-lavender-300/40">
-            <Sparkles size={20} color="#7C3AED" />
+          <View className="h-10 w-10 items-center justify-center rounded-full bg-lavender-200 dark:bg-lavender-500/25">
+            <Sparkles size={20} color={isDark ? colors.accent : '#7C3AED'} />
           </View>
           <View className="flex-1">
             <Text variant="subtitle" className="font-bold">
@@ -199,7 +212,7 @@ export default function StatsScreen() {
           fullWidth
           leftIcon={<Sparkles size={18} color="#fff" />}
         >
-          {routine && isPremium() ? 'Regenerate' : '✨ Generate'}
+          {routine && isPremium() ? 'Regenerate' : ' Generate'}
         </Button>
 
         {routineError ? (
@@ -209,9 +222,9 @@ export default function StatsScreen() {
         ) : null}
       </Card>
 
-      <View className="mb-2 flex-row items-center justify-between">
+      <View className="mb-3 flex-row items-center justify-between">
         <Text variant="subtitle" className="font-bold">
-          Daily Statistics
+          Statistics
         </Text>
         {!isPremium() && activeBabyId ? (
           <Text variant="caption" muted>
@@ -220,19 +233,41 @@ export default function StatsScreen() {
           </Text>
         ) : null}
       </View>
+
+      <View className="mb-4 flex-row gap-2">
+        {STATS_PERIODS.map((p) => (
+          <Pressable
+            key={p.id}
+            onPress={() => setStatsPeriod(p.id)}
+            className={cn(
+              'flex-1 items-center rounded-xl py-2',
+              statsPeriod === p.id
+                ? 'bg-lavender-500 dark:bg-lavender-400'
+                : 'bg-ink-50 dark:bg-ink-600',
+            )}
+          >
+            <Text
+              variant="caption"
+              className={cn(
+                'font-semibold',
+                statsPeriod === p.id ? 'text-white' : 'text-ink-600 dark:text-ink-200',
+              )}
+            >
+              {p.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       <View className="mb-6 flex-row flex-wrap gap-3">
-        {activityCharts.map((chart) => {
-          const activity = getActivityById(chart.activityId);
-          const todayCount = activity ? countTodayForActivity(entries, activity) : 0;
-          return (
-            <ActivityMiniChart
-              key={chart.activityId}
-              data={chart}
-              todayCount={todayCount}
-              onPress={handleChartPress}
-            />
-          );
-        })}
+        {activityCharts.map((chart) => (
+          <ActivityMiniChart
+            key={chart.activityId}
+            data={chart}
+            periodLabel={statsPeriodConfig.caption}
+            onPress={handleChartPress}
+          />
+        ))}
       </View>
 
       <View className="mb-6">

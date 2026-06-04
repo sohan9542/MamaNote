@@ -10,6 +10,7 @@ import {
   Layers,
   Milk,
   Moon,
+  NotebookPen,
   Scale,
   Stethoscope,
   Thermometer,
@@ -94,6 +95,14 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
     instantLog: true,
   },
   {
+    id: 'notes',
+    type: 'note',
+    label: 'Notes',
+    icon: NotebookPen,
+    bg: '#EEEBF4',
+    iconColor: '#6E6485',
+  },
+  {
     id: 'temperature',
     type: 'note',
     label: 'Temperature',
@@ -149,6 +158,32 @@ export const HOME_ACTIVITIES: ActivityOption[] = [
   },
 ];
 
+/** Home screen quick actions (2×2 grid + diaper). Full list stays on Log tab. */
+export const HOME_QUICK_ACTIVITY_IDS = [
+  'sleep',
+  'breastfeeding',
+  'medicine',
+  'notes',
+  'diaper',
+] as const;
+
+export const HOME_QUICK_ACTIVITIES: ActivityOption[] = HOME_QUICK_ACTIVITY_IDS.map(
+  (id) => HOME_ACTIVITIES.find((a) => a.id === id)!,
+);
+
+export function getActivitySurfaceStyle(
+  activity: Pick<ActivityOption, 'bg' | 'iconColor'>,
+  isDark: boolean,
+) {
+  return isDark
+    ? {
+        backgroundColor: `${activity.iconColor}18`,
+        borderColor: `${activity.iconColor}35`,
+        borderWidth: 1 as const,
+      }
+    : { backgroundColor: activity.bg };
+}
+
 export function getActivityById(id: string): ActivityOption | undefined {
   return HOME_ACTIVITIES.find((a) => a.id === id);
 }
@@ -173,6 +208,9 @@ export function getActivityForEntry(
   if (subtype) {
     const bySubtype = HOME_ACTIVITIES.find((a) => a.defaultMetadata?.subtype === subtype);
     if (bySubtype) return bySubtype;
+  }
+  if (type === 'note') {
+    return HOME_ACTIVITIES.find((a) => a.id === 'notes');
   }
   return HOME_ACTIVITIES.find(
     (a) => a.type === type && !a.defaultMetadata?.subtype,

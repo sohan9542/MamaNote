@@ -14,6 +14,8 @@ interface Props {
   lastAt?: string | null;
   todayCount?: number;
   onPress?: () => void;
+  /** `grid` = two columns on home; `scroll` = horizontal carousel (default). */
+  layout?: 'scroll' | 'grid';
 }
 
 export function ActivityCard({
@@ -24,6 +26,7 @@ export function ActivityCard({
   lastAt,
   todayCount = 0,
   onPress,
+  layout = 'scroll',
 }: Props) {
   const { isDark } = useTheme();
   const ago = timeSinceLabel(lastAt);
@@ -41,7 +44,9 @@ export function ActivityCard({
           : { backgroundColor: bg }
       }
       className={cn(
-        'mr-3 h-[124px] w-[108px] items-center justify-center gap-2 rounded-3xl px-2 py-3 active:opacity-85',
+        'min-h-[125px] items-center justify-between rounded-3xl px-2.5 pb-3.5 pt-3 active:opacity-85',
+        layout === 'scroll' && 'mr-3 w-[112px]',
+        layout === 'grid' && 'min-w-[47%] flex-1',
         !isDark && 'border border-transparent',
       )}
     >
@@ -68,11 +73,11 @@ export function ActivityCard({
         ) : null}
       </View>
 
-      <View className="items-center">
+      <View className="w-full items-center -top-3 px-0.5">
         <Text
           variant="caption"
           weight="semiBold"
-          className="text-center text-[13px] leading-4 text-ink-800 dark:text-ink-50"
+          className="text-center text-[12px] leading-[16px] text-ink-800 dark:text-ink-50"
           numberOfLines={2}
         >
           {label}
@@ -80,7 +85,7 @@ export function ActivityCard({
         {ago ? (
           <Text
             variant="caption"
-            className="mt-1 text-center text-[9px] leading-[11px] text-ink-500 dark:text-ink-300"
+            className="mt-1 text-center text-[10px] leading-[14px] text-ink-500 dark:text-ink-300"
             numberOfLines={2}
           >
             {ago}
@@ -88,9 +93,9 @@ export function ActivityCard({
         ) : (
           <Text
             variant="caption"
-            className="mt-1 text-center text-[9px] leading-[11px] text-ink-400 dark:text-ink-400"
+            className="mt-1 text-center text-[10px] leading-[14px] text-ink-400 dark:text-ink-400"
           >
-            Not logged yet
+            No log
           </Text>
         )}
       </View>

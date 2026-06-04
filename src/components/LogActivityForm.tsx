@@ -59,6 +59,7 @@ export function LogActivityForm({
   const [submitting, setSubmitting] = useState(false);
 
   const isDiaper = activity.id === 'diaper';
+  const isGeneralNote = activity.id === 'notes';
   const isBreast = activity.id === 'breastfeeding';
   const isSleep = activity.id === 'sleep';
   const isTemp = activity.id === 'temperature';
@@ -123,6 +124,11 @@ export function LogActivityForm({
       return;
     }
 
+    if (isGeneralNote && !notes.trim()) {
+      Alert.alert('Add a note', 'Write something before saving.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await addEntry({
@@ -155,6 +161,7 @@ export function LogActivityForm({
 
   const headerHint = useMemo(() => {
     if (isDiaper) return 'Tap to log instantly';
+    if (isGeneralNote) return 'Jot down anything about your day';
     if (isBreast) return 'Which side?';
     if (isSleep) return 'How long, or from what time to what time?';
     if (isTemp) return 'Body temperature';
@@ -162,7 +169,7 @@ export function LogActivityForm({
     if (isTimedNote) return 'How long?';
     if (showAmount) return 'Amount (ml)';
     return 'Add details';
-  }, [isDiaper, isBreast, isSleep, isTemp, isGrowth, isTimedNote, showAmount]);
+  }, [isDiaper, isGeneralNote, isBreast, isSleep, isTemp, isGrowth, isTimedNote, showAmount]);
 
   return (
     <View className="gap-5">
@@ -279,7 +286,18 @@ export function LogActivityForm({
         </View>
       )}
 
-      {!isDiaper && (
+      {isGeneralNote && (
+        <Input
+          label="Note"
+          value={notes}
+          onChangeText={setNotes}
+          placeholder="What would you like to remember?"
+          multiline
+          numberOfLines={4}
+        />
+      )}
+
+      {!isDiaper && !isGeneralNote && (
         <Input
           label="Notes (optional)"
           value={notes}

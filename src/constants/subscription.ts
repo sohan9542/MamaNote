@@ -42,6 +42,7 @@ export const PLUS_FEATURES = [
   'Multiple baby profiles',
   'Unlimited sharing with family',
   'Full insights, weekly charts & AI routines',
+  'Cancel anytime',
 ];
 
 /** Set in .env after creating prices in Paddle dashboard (sandbox + live). */

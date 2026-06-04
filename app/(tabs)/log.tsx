@@ -9,12 +9,16 @@ import { Screen } from '@components/Screen';
 import { Text } from '@components/Text';
 import {
   HOME_ACTIVITIES,
+  getActivitySurfaceStyle,
   resolveActivityFromParams,
   type ActivityOption,
 } from '@constants/activities';
+import { useTheme } from '@hooks/useTheme';
+import { cn } from '@utils/cn';
 
 export default function LogScreen() {
   const router = useRouter();
+  const { isDark, colors } = useTheme();
   const params = useLocalSearchParams<{ type?: string; note?: string; activityId?: string }>();
 
   const initialActivity =
@@ -59,13 +63,24 @@ export default function LogScreen() {
               <Pressable
                 key={activity.id}
                 onPress={() => setSelected(activity)}
-                style={{ backgroundColor: activity.bg }}
-                className="w-[47%] items-center rounded-3xl px-3 py-6 active:opacity-85"
+                style={getActivitySurfaceStyle(activity, isDark)}
+                className={cn(
+                  'w-[47%] items-center rounded-3xl px-3 py-6 active:opacity-85',
+                  !isDark && 'border border-transparent',
+                )}
               >
-                <View className="mb-3 h-14 w-14 items-center justify-center rounded-2xl bg-white/90">
+                <View
+                  className={cn(
+                    'mb-3 h-14 w-14 items-center justify-center rounded-2xl',
+                    isDark ? 'bg-ink-800/90' : 'bg-white/90',
+                  )}
+                >
                   <Icon size={28} color={activity.iconColor} strokeWidth={2} />
                 </View>
-                <Text variant="caption" className="text-center font-bold text-ink-800">
+                <Text
+                  variant="caption"
+                  className="text-center font-bold text-ink-800 dark:text-ink-50"
+                >
                   {activity.label}
                 </Text>
               </Pressable>
@@ -84,29 +99,39 @@ export default function LogScreen() {
         onPress={() => setSelected(null)}
         className="mb-4 mt-2 flex-row items-center gap-1 self-start"
       >
-        <ChevronLeft size={20} color="#FB7185" />
-        <Text variant="caption" className="font-semibold text-pink-500">
+        <ChevronLeft size={20} color={colors.primary} />
+        <Text variant="caption" className="font-semibold text-pink-500 dark:text-pink-300">
           All activities
         </Text>
       </Pressable>
 
       <View
-        className="mb-6 flex-row items-center gap-4 rounded-3xl p-5"
-        style={{ backgroundColor: selected.bg }}
+        className={cn(
+          'mb-6 flex-row items-center gap-4 rounded-3xl p-5',
+          !isDark && 'border border-transparent',
+        )}
+        style={getActivitySurfaceStyle(selected, isDark)}
       >
-        <View className="h-16 w-16 items-center justify-center rounded-2xl bg-white/90">
+        <View
+          className={cn(
+            'h-16 w-16 items-center justify-center rounded-2xl',
+            isDark ? 'bg-ink-800/90' : 'bg-white/90',
+          )}
+        >
           <Icon size={32} color={selected.iconColor} strokeWidth={2} />
         </View>
         <View className="flex-1">
-          <Text variant="title" className="font-bold text-ink-900">
+          <Text variant="title" className="font-bold text-ink-800 dark:text-ink-50">
             {selected.label}
           </Text>
-          <Text variant="caption" className="text-ink-600">
+          <Text variant="caption" className="text-ink-600 dark:text-ink-300">
             {selected.id === 'diaper'
               ? 'One tap to log'
               : selected.id === 'medicine'
                 ? 'Log a dose — add times for daily reminders'
-                : 'Fill in details below'}
+                : selected.id === 'notes'
+                  ? 'Write your note below'
+                  : 'Fill in details below'}
           </Text>
         </View>
       </View>

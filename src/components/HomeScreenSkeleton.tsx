@@ -33,7 +33,7 @@ export function HomeScreenSkeleton() {
         {HOME_ACTIVITIES.map((activity) => (
           <Skeleton
             key={activity.id}
-            className="mr-3 h-[124px] w-[108px] rounded-3xl"
+            className="mr-3 h-[132px] w-[112px] rounded-3xl"
           />
         ))}
       </ScrollView>
