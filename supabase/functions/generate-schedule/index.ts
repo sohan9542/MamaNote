@@ -189,7 +189,8 @@ Deno.serve(async (req) => {
     const hasPaidPremium = entitlement.status === "active" ||
       entitlement.status === "trialing";
     const complimentaryUntil = entitlement.complimentary_premium_until;
-    const isComplimentaryPremium = complimentaryUntil != null &&
+    const isComplimentaryPremium = !hasPaidPremium &&
+      complimentaryUntil != null &&
       new Date(complimentaryUntil) > new Date();
     const isPremium = hasPaidPremium || isComplimentaryPremium;
 

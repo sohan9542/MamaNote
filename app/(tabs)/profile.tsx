@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import {
   Bell,
   ChevronRight,
@@ -41,9 +41,11 @@ export default function ProfileScreen() {
 
   const [portalLoading, setPortalLoading] = useState(false);
 
-  useEffect(() => {
-    fetchSubscription();
-  }, [fetchSubscription]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchSubscription();
+    }, [fetchSubscription]),
+  );
 
   const fullName =
     (user?.user_metadata?.full_name as string | undefined) ?? 'MamaNote user';
@@ -88,11 +90,13 @@ export default function ProfileScreen() {
           label="MamaNote Plus"
           right={
             <Text variant="caption" muted>
-              {isComplimentaryPremium()
-                ? `Plus trial · ${complimentaryDaysLeft() ?? 0}d left`
-                : isPremium()
-                  ? `${statusLabel(entitlement?.status ?? 'free')} · ${planLabel(entitlement?.plan)}`
-                  : 'Free'}
+              {hasPaidPremium()
+                ? `${statusLabel(entitlement?.status ?? 'free')} · ${planLabel(entitlement?.plan)}`
+                : isComplimentaryPremium()
+                  ? `Plus trial · ${complimentaryDaysLeft() ?? 0}d left`
+                  : isPremium()
+                    ? `${statusLabel(entitlement?.status ?? 'free')} · ${planLabel(entitlement?.plan)}`
+                    : 'Free'}
             </Text>
           }
         />

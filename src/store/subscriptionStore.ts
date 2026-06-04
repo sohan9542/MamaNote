@@ -24,6 +24,8 @@ export interface SubscriptionEntitlement {
 interface SubscriptionState {
   entitlement: SubscriptionEntitlement | null;
   loading: boolean;
+  /** True after the first fetch completes for the current session. */
+  hydrated: boolean;
   error: string | null;
   paywallVisible: boolean;
 
@@ -54,6 +56,7 @@ const DEFAULT: SubscriptionEntitlement = {
 export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   entitlement: null,
   loading: false,
+  hydrated: false,
   error: null,
   paywallVisible: false,
 
@@ -65,6 +68,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   isComplimentaryPremium: () => {
+    if (get().hasPaidPremium()) return false;
     const until = get().entitlement?.complimentaryPremiumUntil;
     return until != null && new Date(until) > new Date();
   },
@@ -87,7 +91,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        set({ entitlement: null, loading: false });
+        set({ entitlement: null, loading: false, hydrated: true });
         return;
       }
 
@@ -113,9 +117,10 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
             }
           : DEFAULT,
         loading: false,
+        hydrated: true,
       });
     } catch (e) {
-      set({ loading: false, error: (e as Error).message });
+      set({ loading: false, hydrated: true, error: (e as Error).message });
     }
   },
 
@@ -126,6 +131,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
     set({
       entitlement: null,
       loading: false,
+      hydrated: false,
       error: null,
       paywallVisible: false,
     }),

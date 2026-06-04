@@ -28,6 +28,8 @@ type PaddleTransaction = {
   items?: Array<{ price?: { id?: string; billing_cycle?: unknown } }>;
 };
 
+const PAID_PREMIUM_STATUSES = new Set(["active", "trialing"]);
+
 async function upsertEntitlement(
   serviceClient: ReturnType<typeof createClient>,
   userId: string,
@@ -39,6 +41,8 @@ async function upsertEntitlement(
     current_period_end?: string | null;
   },
 ) {
+  const clearComplimentaryTrial = PAID_PREMIUM_STATUSES.has(patch.status);
+
   const { error } = await serviceClient.from("subscriptions").upsert(
     {
       user_id: userId,
@@ -48,6 +52,9 @@ async function upsertEntitlement(
       paddle_customer_id: patch.paddle_customer_id ?? null,
       paddle_subscription_id: patch.paddle_subscription_id ?? null,
       current_period_end: patch.current_period_end ?? null,
+      ...(clearComplimentaryTrial
+        ? { complimentary_premium_until: null }
+        : {}),
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" },

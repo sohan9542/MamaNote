@@ -16,7 +16,9 @@ export function buildFreemiumAccess(
     entitlement != null && PREMIUM_STATUSES.includes(entitlement.status);
   const complimentaryUntil = entitlement?.complimentaryPremiumUntil;
   const isComplimentaryPremium =
-    complimentaryUntil != null && new Date(complimentaryUntil) > new Date();
+    !hasPaidPremium &&
+    complimentaryUntil != null &&
+    new Date(complimentaryUntil) > new Date();
   const isPremium = hasPaidPremium || isComplimentaryPremium;
   const isLimitedFree = !isPremium;
 

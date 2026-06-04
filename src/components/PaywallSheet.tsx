@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, Modal, Platform, Pressable, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, Sparkles, X } from 'lucide-react-native';
 
@@ -14,6 +15,7 @@ import {
   type SubscriptionPlan,
 } from '@constants/subscription';
 import {
+  checkoutSuccessRoute,
   openCheckout,
   requiresExternalPurchaseDisclosure,
 } from '@lib/subscription';
@@ -26,6 +28,7 @@ interface Props {
 }
 
 export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>('annual');
   const [loading, setLoading] = useState(false);
@@ -40,10 +43,11 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
     }
     setLoading(true);
     try {
-      const completed = await openCheckout(selectedPlan);
-      if (completed) {
+      const result = await openCheckout(selectedPlan);
+      if (result.type === 'success') {
         onSubscribed?.();
         onClose();
+        router.replace(checkoutSuccessRoute(result.transactionId));
       }
     } catch (e) {
       setError((e as Error).message);

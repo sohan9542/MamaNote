@@ -16,9 +16,9 @@ import { PaywallSheet } from '@components/PaywallSheet';
 import { useAppFonts } from '@hooks/useAppFonts';
 import { isEmailConfirmed } from '@lib/auth';
 import {
-  isCheckoutSuccessUrl,
+  checkoutSuccessRoute,
   subscribeToAppState,
-  subscribeToDeepLinks,
+  subscribeToCheckoutSuccessDeepLinks,
 } from '@lib/subscription';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
@@ -93,6 +93,7 @@ function ThemedShell() {
   const onOnboarding = pathname.includes('onboarding');
   const onAuthScreen = pathname.includes('(auth)') || pathname.startsWith('/sign-');
   const isPublicShareView = /^\/share\/[^/]+$/.test(pathname);
+  const onSubscribeSuccessScreen = pathname.includes('/subscribe/success');
   const emailConfirmed = isEmailConfirmed(user);
   const verifyEmail = pendingVerificationEmail ?? user?.email ?? '';
 
@@ -123,21 +124,22 @@ function ThemedShell() {
   ]);
 
   useEffect(() => {
+    return subscribeToCheckoutSuccessDeepLinks((parsed) => {
+      hidePaywall();
+      router.replace(checkoutSuccessRoute(parsed.transactionId));
+    });
+  }, [router, hidePaywall]);
+
+  useEffect(() => {
     if (!session || !emailConfirmed) return;
 
     const refreshEntitlement = () => {
       fetchSubscription();
     };
 
-    const unsubDeepLink = subscribeToDeepLinks((url) => {
-      if (isCheckoutSuccessUrl(url)) refreshEntitlement();
-    });
     const unsubAppState = subscribeToAppState(refreshEntitlement);
 
-    return () => {
-      unsubDeepLink();
-      unsubAppState();
-    };
+    return unsubAppState;
   }, [session, emailConfirmed, fetchSubscription]);
 
   useEffect(() => {
@@ -193,14 +195,21 @@ function ThemedShell() {
       !onPasswordResetFlow &&
       !pendingVerificationEmail &&
       !pendingPasswordResetEmail &&
-      !isPublicShareView
+      !isPublicShareView &&
+      !onSubscribeSuccessScreen
     ) {
       router.replace('/(auth)/sign-in');
       return;
     }
 
     // Verified user should leave auth screens (except password reset)
-    if (session && emailConfirmed && onAuthScreen && !onPasswordResetFlow) {
+    if (
+      session &&
+      emailConfirmed &&
+      onAuthScreen &&
+      !onPasswordResetFlow &&
+      !onSubscribeSuccessScreen
+    ) {
       router.replace('/(tabs)');
       return;
     }
@@ -212,7 +221,8 @@ function ThemedShell() {
       babiesInitialized &&
       babies.length === 0 &&
       !onOnboarding &&
-      !onAuthScreen
+      !onAuthScreen &&
+      !onSubscribeSuccessScreen
     ) {
       router.replace('/onboarding');
       return;
@@ -240,6 +250,7 @@ function ThemedShell() {
     babiesInitialized,
     onOnboarding,
     isPublicShareView,
+    onSubscribeSuccessScreen,
     router,
   ]);
 
@@ -269,6 +280,10 @@ function ThemedShell() {
           options={{ animation: 'slide_from_right' }}
         />
         <Stack.Screen name="sleep" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen
+          name="subscribe/success"
+          options={{ animation: 'fade', gestureEnabled: false }}
+        />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
       <PaywallSheet

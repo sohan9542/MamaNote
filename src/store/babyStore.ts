@@ -41,6 +41,8 @@ interface BabyState {
   activeBabyId: string | null;
   entries: LogEntry[];
   loading: boolean;
+  /** Baby id whose log entries have been fetched for the current session. */
+  entriesReadyBabyId: string | null;
   babiesInitialized: boolean;
   error: string | null;
 
@@ -67,6 +69,7 @@ export const useBabyStore = create<BabyState>((set, get) => ({
   activeBabyId: null,
   entries: [],
   loading: false,
+  entriesReadyBabyId: null,
   babiesInitialized: false,
   error: null,
 
@@ -80,7 +83,7 @@ export const useBabyStore = create<BabyState>((set, get) => ({
     if (!babies.some((baby) => baby.id === id) || activeBabyId === id) return;
 
     void writeActiveBabyId(id);
-    set({ activeBabyId: id, entries: [] });
+    set({ activeBabyId: id, entries: [], entriesReadyBabyId: null });
     await get().fetchEntries(id);
   },
 
@@ -140,16 +143,26 @@ export const useBabyStore = create<BabyState>((set, get) => ({
       await writeActiveBabyId(activeBabyId);
     }
 
+    const entriesStillValid =
+      activeBabyId != null && get().entriesReadyBabyId === activeBabyId;
+
     set({
       babies,
       activeBabyId,
       loading: false,
       babiesInitialized: true,
+      ...(entriesStillValid ? {} : { entriesReadyBabyId: null }),
     });
   },
 
   fetchEntries: async (babyId) => {
-    set({ loading: true, error: null });
+    const staleBaby =
+      get().entries.length > 0 && get().entries[0]?.baby_id !== babyId;
+    set({
+      loading: true,
+      error: null,
+      ...(staleBaby ? { entries: [] } : {}),
+    });
     const { data, error } = await supabase
       .from('log_entries')
       .select('*')
@@ -158,10 +171,14 @@ export const useBabyStore = create<BabyState>((set, get) => ({
       .limit(200);
 
     if (error) {
-      set({ loading: false, error: error.message });
+      set({ loading: false, entriesReadyBabyId: babyId, error: error.message });
       return;
     }
-    set({ entries: data ?? [], loading: false });
+    set({
+      entries: data ?? [],
+      loading: false,
+      entriesReadyBabyId: babyId,
+    });
   },
 
   addEntry: async (entry) => {

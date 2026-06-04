@@ -10,6 +10,7 @@ import { LogEntryDetailSheet } from '@components/LogEntryDetailSheet';
 import { LogEntryRow } from '@components/LogEntryRow';
 import { MedicineSheet } from '@components/MedicineSheet';
 import { FeatureHubCards } from '@components/FeatureHubCards';
+import { HomeScreenSkeleton } from '@components/HomeScreenSkeleton';
 import { TrialStatusBanner } from '@components/TrialStatusBanner';
 import { RoutinePreviewCard } from '@components/RoutinePreviewCard';
 import { QuickLogSheet } from '@components/QuickLogSheet';
@@ -19,6 +20,7 @@ import { HOME_ACTIVITIES, type ActivityOption } from '@constants/activities';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useScheduleStore } from '@store/scheduleStore';
+import { useSubscriptionStore } from '@store/subscriptionStore';
 import {
   countTodayForActivity,
   getLastEntryForActivity,
@@ -34,8 +36,11 @@ export default function HomeScreen() {
   const babies = useBabyStore((s) => s.babies);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const entries = useBabyStore((s) => s.entries);
+  const babiesInitialized = useBabyStore((s) => s.babiesInitialized);
+  const entriesReadyBabyId = useBabyStore((s) => s.entriesReadyBabyId);
   const fetchBabies = useBabyStore((s) => s.fetchBabies);
   const fetchEntries = useBabyStore((s) => s.fetchEntries);
+  const fetchSubscription = useSubscriptionStore((s) => s.fetch);
   const routine = useScheduleStore((s) => s.routine);
   const fetchLatestRoutine = useScheduleStore((s) => s.fetchLatest);
 
@@ -46,19 +51,22 @@ export default function HomeScreen() {
   const lastFeed = getLastFeedEntry(entries);
 
   const load = useCallback(async () => {
-    await fetchBabies();
-  }, [fetchBabies]);
+    await Promise.all([fetchBabies(), fetchSubscription()]);
+  }, [fetchBabies, fetchSubscription]);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
+  const entriesReady =
+    !activeBabyId || entriesReadyBabyId === activeBabyId;
+  const showContentSkeleton = !babiesInitialized || !entriesReady;
+
   useEffect(() => {
-    if (activeBabyId) {
-      fetchEntries(activeBabyId);
-      fetchLatestRoutine(activeBabyId);
-    }
-  }, [activeBabyId, fetchEntries, fetchLatestRoutine]);
+    if (!babiesInitialized || !activeBabyId) return;
+    void fetchEntries(activeBabyId);
+    void fetchLatestRoutine(activeBabyId);
+  }, [babiesInitialized, activeBabyId, fetchEntries, fetchLatestRoutine]);
 
   const openActivity = (activity: ActivityOption) => {
     setSheetActivity(activity);
@@ -104,12 +112,86 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* <TrialStatusBanner /> */}
+      <TrialStatusBanner />
 
-      {activeBaby ? (
+      {showContentSkeleton ? (
+        <HomeScreenSkeleton />
+      ) : activeBaby ? (
         <>
           <BabySwitcher />
           <BabyProfileCard baby={activeBaby} lastFeedAt={lastFeed?.started_at ?? null} />
+          <FeatureHubCards />
+          {routine ? (
+            <View className="mb-6">
+              <RoutinePreviewCard routine={routine} onPress={openRoutine} />
+            </View>
+          ) : null}
+
+          <View className="mb-3 flex-row items-center justify-between">
+            <Text variant="subtitle" className="font-bold">
+              Activities
+            </Text>
+            <Pressable onPress={() => router.push('/(tabs)/log')} hitSlop={8}>
+              <Text variant="caption" className="font-semibold text-pink-500 dark:text-pink-300">
+                View all
+              </Text>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-6"
+            contentContainerClassName="gap-0 pr-4"
+          >
+            {HOME_ACTIVITIES.map((activity) => {
+              const last = getLastEntryForActivity(entries, activity);
+              const todayCount = countTodayForActivity(entries, activity);
+              return (
+                <ActivityCard
+                  key={activity.id}
+                  label={activity.label}
+                  icon={activity.icon}
+                  bg={activity.bg}
+                  iconColor={activity.iconColor}
+                  lastAt={last?.started_at}
+                  todayCount={todayCount}
+                  onPress={() => openActivity(activity)}
+                />
+              );
+            })}
+          </ScrollView>
+
+          <View className="mb-3 flex-row items-center justify-between">
+            <Text variant="subtitle" className="font-bold">
+              Recent activities
+            </Text>
+            <Text variant="caption" muted>
+              {entries.length} total
+            </Text>
+          </View>
+
+          <View className="gap-3">
+            {entries.length === 0 ? (
+              <View className="items-center rounded-3xl border border-ink-100/60 bg-white py-12 dark:border-ink-600 dark:bg-ink-700">
+                <Text className="text-3xl">🌼</Text>
+                <Text variant="subtitle" className="mt-2">
+                  No activities yet
+                </Text>
+                <Text muted variant="caption" className="mt-1 px-6 text-center">
+                  Tap an activity above — most logs take just one or two taps.
+                </Text>
+              </View>
+            ) : (
+              entries.slice(0, 10).map((entry) => (
+                <LogEntryRow
+                  key={entry.id}
+                  entry={entry}
+                  onPress={() => setSelectedEntry(entry)}
+                />
+              ))
+            )}
+          </View>
         </>
       ) : (
         <View className="mb-6 rounded-3xl border border-dashed border-pink-200 bg-pink-50 p-6 dark:border-ink-600 dark:bg-ink-700">
@@ -119,80 +201,6 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
-
-      {activeBaby ? <FeatureHubCards /> : null}
-
-      {routine ? (
-        <View className="mb-6">
-          <RoutinePreviewCard routine={routine} onPress={openRoutine} />
-        </View>
-      ) : null}
-
-      <View className="mb-3 flex-row items-center justify-between">
-        <Text variant="subtitle" className="font-bold">
-          Activities
-        </Text>
-        <Pressable onPress={() => router.push('/(tabs)/log')} hitSlop={8}>
-          <Text variant="caption" className="font-semibold text-pink-500 dark:text-pink-300">
-            View all
-          </Text>
-        </Pressable>
-      </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="mb-6"
-        contentContainerClassName="gap-0 pr-4"
-      >
-        {HOME_ACTIVITIES.map((activity) => {
-          const last = getLastEntryForActivity(entries, activity);
-          const todayCount = countTodayForActivity(entries, activity);
-          return (
-            <ActivityCard
-              key={activity.id}
-              label={activity.label}
-              icon={activity.icon}
-              bg={activity.bg}
-              iconColor={activity.iconColor}
-              lastAt={last?.started_at}
-              todayCount={todayCount}
-              onPress={() => openActivity(activity)}
-            />
-          );
-        })}
-      </ScrollView>
-
-      <View className="mb-3 flex-row items-center justify-between">
-        <Text variant="subtitle" className="font-bold">
-          Recent activities
-        </Text>
-        <Text variant="caption" muted>
-          {entries.length} total
-        </Text>
-      </View>
-
-      <View className="gap-3">
-        {entries.length === 0 ? (
-          <View className="items-center rounded-3xl border border-ink-100/60 bg-white py-12 dark:border-ink-600 dark:bg-ink-700">
-            <Text className="text-3xl">🌼</Text>
-            <Text variant="subtitle" className="mt-2">
-              No activities yet
-            </Text>
-            <Text muted variant="caption" className="mt-1 px-6 text-center">
-              Tap an activity above — most logs take just one or two taps.
-            </Text>
-          </View>
-        ) : (
-          entries.slice(0, 10).map((entry) => (
-            <LogEntryRow
-              key={entry.id}
-              entry={entry}
-              onPress={() => setSelectedEntry(entry)}
-            />
-          ))
-        )}
-      </View>
 
       <LogEntryDetailSheet
         entry={selectedEntry}

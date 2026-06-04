@@ -1,15 +1,19 @@
 import { Pressable, View } from 'react-native';
 import { Sparkles } from 'lucide-react-native';
 
+import { TrialBannerSkeleton } from '@components/HomeScreenSkeleton';
 import { Text } from './Text';
 import { COMPLIMENTARY_PLUS_DAYS, POST_TRIAL_DAILY_LOG_LIMIT } from '@constants/freemium';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 
 export function TrialStatusBanner() {
+  const hydrated = useSubscriptionStore((s) => s.hydrated);
   const isComplimentaryPremium = useSubscriptionStore((s) => s.isComplimentaryPremium);
   const isLimitedFree = useSubscriptionStore((s) => s.isLimitedFree);
   const daysLeft = useSubscriptionStore((s) => s.complimentaryDaysRemaining);
   const showPaywall = useSubscriptionStore((s) => s.showPaywall);
+
+  if (!hydrated) return <TrialBannerSkeleton />;
 
   if (!isComplimentaryPremium() && !isLimitedFree()) return null;
 

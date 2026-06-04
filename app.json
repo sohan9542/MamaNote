@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mamanote",
+    "name": "MamaNote",
     "slug": "mamanote",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mamanote.app",
+      "bundleIdentifier": "mamanoteapp.com",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
       "associatedDomains": []
     },
     "android": {
-      "package": "com.mamanote.app",
+      "package": "mamanoteapp.com",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -42,7 +42,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF6077"
+        "backgroundColor": "#E32D47"
       }
     },
     "web": {
@@ -61,9 +61,9 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 260,
           "resizeMode": "contain",
-          "backgroundColor": "#FF6077",
+          "backgroundColor": "#E32D47",
           "dark": {
-            "backgroundColor": "#FF6077"
+            "backgroundColor": "#E32D47"
           }
         }
       ],

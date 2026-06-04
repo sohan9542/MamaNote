@@ -9,10 +9,62 @@ import {
 } from '@constants/subscription';
 import { supabase } from '@lib/supabase';
 
+/** Deep link path after Paddle checkout (scheme: mamanote). Custom schemes often fail on emulators — use a dev client on a real device. */
 export const CHECKOUT_SUCCESS_PATH = 'subscribe/success';
+
+/** How often to refetch subscription while waiting for the Paddle webhook. */
+export const PLUS_ACTIVATION_POLL_MS = 2_000;
+
+/** Stop polling and show the “still processing” state after this long. */
+export const PLUS_ACTIVATION_TIMEOUT_MS = 30_000;
 
 export function isCheckoutSuccessUrl(url: string): boolean {
   return url.includes(CHECKOUT_SUCCESS_PATH);
+}
+
+export function parseCheckoutSuccessUrl(
+  url: string,
+): { transactionId?: string } | null {
+  if (!url.includes(CHECKOUT_SUCCESS_PATH)) return null;
+
+  const parsed = Linking.parse(url);
+  const raw = parsed.queryParams?.transactionId;
+  const transactionId =
+    typeof raw === 'string'
+      ? raw
+      : Array.isArray(raw) && typeof raw[0] === 'string'
+        ? raw[0]
+        : undefined;
+
+  if (transactionId) {
+    console.info('[checkout] Paddle transactionId:', transactionId);
+  }
+
+  return { transactionId };
+}
+
+export function checkoutSuccessRoute(transactionId?: string): {
+  pathname: '/subscribe/success';
+  params: { transactionId?: string };
+} {
+  return {
+    pathname: '/subscribe/success',
+    params: transactionId ? { transactionId } : {},
+  };
+}
+
+/** Close the in-app checkout browser if it is still open after redirect. */
+export async function dismissCheckoutBrowser(): Promise<void> {
+  try {
+    await WebBrowser.dismissBrowser();
+  } catch {
+    /* Auth session may already have closed the sheet */
+  }
+  try {
+    await WebBrowser.dismissAuthSession();
+  } catch {
+    /* noop */
+  }
 }
 
 async function invokeErrorMessage(error: unknown): Promise<string> {
@@ -64,7 +116,13 @@ export async function openCustomerPortal(): Promise<string> {
   return portalUrl;
 }
 
-export async function openCheckout(plan: SubscriptionPlan): Promise<boolean> {
+export type CheckoutSessionResult =
+  | { type: 'cancelled' }
+  | { type: 'success'; transactionId?: string };
+
+export async function openCheckout(
+  plan: SubscriptionPlan,
+): Promise<CheckoutSessionResult> {
   const checkoutUrl = await createCheckoutSession(plan);
   const redirectUrl = Linking.createURL(CHECKOUT_SUCCESS_PATH);
 
@@ -72,7 +130,23 @@ export async function openCheckout(plan: SubscriptionPlan): Promise<boolean> {
   // checkout hits mamanote://subscribe/success. openBrowserAsync cannot do that.
   const result = await WebBrowser.openAuthSessionAsync(checkoutUrl, redirectUrl);
 
-  return result.type === 'success' && !!result.url && isCheckoutSuccessUrl(result.url);
+  if (result.type === 'success' && result.url && result.url.includes(CHECKOUT_SUCCESS_PATH)) {
+    await dismissCheckoutBrowser();
+    const parsed = parseCheckoutSuccessUrl(result.url);
+    return { type: 'success', transactionId: parsed?.transactionId };
+  }
+
+  return { type: 'cancelled' };
+}
+
+/** Handle mamanote://subscribe/success from web checkout or cold start. */
+export async function handleCheckoutSuccessDeepLink(url: string): Promise<{
+  transactionId?: string;
+} | null> {
+  const parsed = parseCheckoutSuccessUrl(url);
+  if (!parsed) return null;
+  await dismissCheckoutBrowser();
+  return parsed;
 }
 
 export async function openBillingPortal(): Promise<void> {
@@ -100,5 +174,24 @@ export function subscribeToDeepLinks(onUrl: (url: string) => void): () => void {
   });
 
   const sub = Linking.addEventListener('url', handle);
+  return () => sub.remove();
+}
+
+/** Listens for mamanote://subscribe/success (and initial URL on cold start). */
+export function subscribeToCheckoutSuccessDeepLinks(
+  onSuccess: (params: { transactionId?: string }) => void,
+): () => void {
+  const handleUrl = (url: string) => {
+    void (async () => {
+      const parsed = await handleCheckoutSuccessDeepLink(url);
+      if (parsed) onSuccess(parsed);
+    })();
+  };
+
+  Linking.getInitialURL().then((url) => {
+    if (url) handleUrl(url);
+  });
+
+  const sub = Linking.addEventListener('url', ({ url }) => handleUrl(url));
   return () => sub.remove();
 }
