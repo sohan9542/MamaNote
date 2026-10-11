@@ -7,7 +7,6 @@
       "@/*": ["./*"],
       "@app/*": ["./app/*"],
       "@components/*": ["./src/components/*"],
-      "@screens/*": ["./src/screens/*"],
       "@lib/*": ["./src/lib/*"],
       "@store/*": ["./src/store/*"],
       "@hooks/*": ["./src/hooks/*"],
@@ -16,14 +15,6 @@
       "@constants/*": ["./src/constants/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "nativewind-env.d.ts"
-  ],
-  "exclude": [
-    "supabase/functions/**"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
+  "exclude": ["supabase/functions/**"]
 }

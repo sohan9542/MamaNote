@@ -9,6 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+coverage/
 
 # macOS
 .DS_Store
@@ -35,3 +36,6 @@ logs
 
 # Expo
 expo-env.d.ts
+
+# Supabase CLI local state (may contain project refs / connection hints)
+supabase/.temp/

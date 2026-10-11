@@ -1,0 +1,12 @@
+node_modules
+.expo
+dist
+coverage
+package-lock.json
+supabase/.temp
+supabase/**/*.sql
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.svg
