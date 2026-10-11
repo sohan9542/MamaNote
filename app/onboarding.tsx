@@ -7,7 +7,7 @@ import { Screen } from '@components/Screen';
 import { Text } from '@components/Text';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
-import { handleFreemiumError } from '@utils/freemiumError';
+import { handleFreemiumError } from '@utils/plusUpgrade';
 
 export default function OnboardingScreen() {
   const router = useRouter();

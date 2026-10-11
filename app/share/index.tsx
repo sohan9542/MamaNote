@@ -14,13 +14,9 @@ import { assertCanCreateShare } from '@lib/freemium';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
-import { handleFreemiumError } from '@utils/freemiumError';
-import { PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
+import { handleFreemiumError, PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
 import type { ActivityShare } from '@app-types/share';
-import {
-  filterEntriesForShare,
-  shareFilterLabel,
-} from '@utils/share';
+import { filterEntriesForShare, shareFilterLabel } from '@utils/share';
 
 export default function ShareActivitiesScreen() {
   const router = useRouter();
@@ -82,10 +78,7 @@ export default function ShareActivitiesScreen() {
 
     setCreating(true);
     try {
-      await assertCanCreateShare(
-        user.id,
-        useSubscriptionStore.getState().getFreemiumAccess(),
-      );
+      await assertCanCreateShare(user.id, useSubscriptionStore.getState().getFreemiumAccess());
       const created = await createActivityShare({
         babyId: activeBaby.id,
         userId: user.id,
@@ -132,8 +125,8 @@ export default function ShareActivitiesScreen() {
         <>
           <View className="mb-6 rounded-3xl border border-ink-100/60 bg-lavender-100/60 p-5 dark:border-ink-600 dark:bg-lavender-200/10">
             <Text variant="caption" className="leading-6 text-ink-700 dark:text-ink-100">
-              Create a secure link or QR code so partners, family, or caregivers can view
-              selected activities. Links expire after 7 days.
+              Create a secure link or QR code so partners, family, or caregivers can view selected
+              activities. Links expire after 7 days.
             </Text>
           </View>
 
@@ -146,8 +139,8 @@ export default function ShareActivitiesScreen() {
 
           <View className="mt-8 gap-3">
             <Text variant="caption" muted className="text-center">
-              {previewEntries.length}{' '}
-              {previewEntries.length === 1 ? 'activity' : 'activities'} will be included
+              {previewEntries.length} {previewEntries.length === 1 ? 'activity' : 'activities'} will
+              be included
             </Text>
             <Button onPress={handleCreate} loading={creating} size="lg" fullWidth>
               Create share link

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityIndicator, Modal, Platform, Pressable, View } from 'react-native';
+import { Modal, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, Sparkles, X } from 'lucide-react-native';
@@ -75,7 +75,6 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
                   <Text variant="subtitle" className="font-bold">
                     MamaNote Plus
                   </Text>
-               
                 </View>
               </View>
               <Pressable
@@ -113,7 +112,10 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
                         <Text className="font-semibold">{plan.label}</Text>
                         {plan.badge ? (
                           <View className="rounded-full bg-lavender-300/50 px-2 py-0.5">
-                            <Text variant="caption" className="text-xs font-semibold text-lavender-700">
+                            <Text
+                              variant="caption"
+                              className="text-lavender-700 font-semibold text-xs"
+                            >
                               {plan.badge}
                             </Text>
                           </View>
@@ -133,9 +135,8 @@ export function PaywallSheet({ visible, onClose, onSubscribed }: Props) {
           {showDisclosure && Platform.OS === 'ios' ? (
             <Card tone="beige" className="mb-4">
               <Text variant="caption" muted className="leading-5">
-                You are about to leave the app to complete your purchase on our
-                website. Apple is not responsible for the privacy or security of
-                payments made on external websites.
+                You are about to leave the app to complete your purchase on our website. Apple is
+                not responsible for the privacy or security of payments made on external websites.
               </Text>
             </Card>
           ) : null}

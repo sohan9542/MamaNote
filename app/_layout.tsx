@@ -1,4 +1,6 @@
 import '../global.css';
+// Side-effect import required by RNGH before other RN imports.
+// eslint-disable-next-line import/no-duplicates
 import 'react-native-gesture-handler';
 
 import { useEffect } from 'react';
@@ -6,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
+// eslint-disable-next-line import/no-duplicates
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View } from 'react-native';
@@ -154,12 +157,7 @@ function ThemedShell() {
     }
 
     // Password reset: awaiting recovery OTP
-    if (
-      pendingPasswordResetEmail &&
-      !session &&
-      !onVerifyResetScreen &&
-      !onForgotPasswordScreen
-    ) {
+    if (pendingPasswordResetEmail && !session && !onVerifyResetScreen && !onForgotPasswordScreen) {
       router.replace(
         `/(auth)/verify-reset-password?email=${encodeURIComponent(pendingPasswordResetEmail)}` as const,
       );
@@ -167,12 +165,7 @@ function ThemedShell() {
     }
 
     // Password reset: OTP verified, must set new password
-    if (
-      pendingPasswordResetEmail &&
-      session &&
-      emailConfirmed &&
-      !onResetPasswordScreen
-    ) {
+    if (pendingPasswordResetEmail && session && emailConfirmed && !onResetPasswordScreen) {
       router.replace(
         `/(auth)/reset-password?email=${encodeURIComponent(pendingPasswordResetEmail)}` as const,
       );
@@ -181,9 +174,7 @@ function ThemedShell() {
 
     // Signed in but email not verified
     if (session && user && !emailConfirmed && !onVerifyScreen) {
-      router.replace(
-        `/(auth)/verify-email?email=${encodeURIComponent(verifyEmail)}` as const,
-      );
+      router.replace(`/(auth)/verify-email?email=${encodeURIComponent(verifyEmail)}` as const);
       return;
     }
 
@@ -275,10 +266,7 @@ function ThemedShell() {
         <Stack.Screen name="privacy" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="notifications" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="add-baby" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen
-          name="growth-skills"
-          options={{ animation: 'slide_from_right' }}
-        />
+        <Stack.Screen name="growth-skills" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="sleep" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen
           name="subscribe/success"

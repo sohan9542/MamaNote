@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Rect, Text as SvgText } from 'react-native-svg';
 
-import { Text } from './Text';
 import type { RoutineBlock } from '@app-types/schedule';
 import { routineToTimeline } from '@utils/routineTimeline';
 

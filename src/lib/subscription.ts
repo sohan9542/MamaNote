@@ -3,10 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { AppState, Platform } from 'react-native';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
-import {
-  PADDLE_PRICE_IDS,
-  type SubscriptionPlan,
-} from '@constants/subscription';
+import { PADDLE_PRICE_IDS, type SubscriptionPlan } from '@constants/subscription';
 import { supabase } from '@lib/supabase';
 
 /** Deep link path after Paddle checkout (scheme: mamanote). Custom schemes often fail on emulators — use a dev client on a real device. */
@@ -22,9 +19,7 @@ export function isCheckoutSuccessUrl(url: string): boolean {
   return url.includes(CHECKOUT_SUCCESS_PATH);
 }
 
-export function parseCheckoutSuccessUrl(
-  url: string,
-): { transactionId?: string } | null {
+export function parseCheckoutSuccessUrl(url: string): { transactionId?: string } | null {
   if (!url.includes(CHECKOUT_SUCCESS_PATH)) return null;
 
   const parsed = Linking.parse(url);
@@ -35,10 +30,6 @@ export function parseCheckoutSuccessUrl(
       : Array.isArray(raw) && typeof raw[0] === 'string'
         ? raw[0]
         : undefined;
-
-  if (transactionId) {
-    console.info('[checkout] Paddle transactionId:', transactionId);
-  }
 
   return { transactionId };
 }
@@ -120,9 +111,7 @@ export type CheckoutSessionResult =
   | { type: 'cancelled' }
   | { type: 'success'; transactionId?: string };
 
-export async function openCheckout(
-  plan: SubscriptionPlan,
-): Promise<CheckoutSessionResult> {
+export async function openCheckout(plan: SubscriptionPlan): Promise<CheckoutSessionResult> {
   const checkoutUrl = await createCheckoutSession(plan);
   const redirectUrl = Linking.createURL(CHECKOUT_SUCCESS_PATH);
 

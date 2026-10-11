@@ -1,7 +1,8 @@
 import type { LogEntry } from '@app-types/database';
 import type { ActivityOption } from '@constants/activities';
 import type { LogMetadata } from '@constants/logFields';
-import { formatTime } from '@utils/date';
+import { entryMatchesActivity } from '@utils/activityMatch';
+import { entryOnLocalDate, formatTime, localDateKey } from '@utils/date';
 
 const FEED_TYPES = new Set(['feeding', 'pump']);
 
@@ -9,10 +10,7 @@ export function getLastFeedEntry(entries: LogEntry[]): LogEntry | null {
   return entries.find((e) => FEED_TYPES.has(e.type)) ?? null;
 }
 
-export function getLastEntryOfType(
-  entries: LogEntry[],
-  type: LogEntry['type'],
-): LogEntry | null {
+export function getLastEntryOfType(entries: LogEntry[], type: LogEntry['type']): LogEntry | null {
   return entries.find((e) => e.type === type) ?? null;
 }
 
@@ -25,43 +23,14 @@ export function getLastEntryForActivity(
   entries: LogEntry[],
   activity: ActivityOption,
 ): LogEntry | null {
-  const meta = activity.defaultMetadata;
-
-  return (
-    entries.find((e) => {
-      if (e.type !== activity.type) return false;
-      if (activity.id === 'notes') {
-        return !entryMeta(e).subtype;
-      }
-      if (meta?.subtype) {
-        return entryMeta(e).subtype === meta.subtype;
-      }
-      return true;
-    }) ?? null
-  );
+  return entries.find((e) => entryMatchesActivity(e, activity)) ?? null;
 }
 
-export function countTodayForActivity(
-  entries: LogEntry[],
-  activity: ActivityOption,
-): number {
-  const today = new Date();
-  return entries.filter((e) => {
-    const d = new Date(e.started_at);
-    const isToday =
-      d.getDate() === today.getDate() &&
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear();
-    if (!isToday) return false;
-    if (e.type !== activity.type) return false;
-    if (activity.id === 'notes') {
-      return !entryMeta(e).subtype;
-    }
-    if (activity.defaultMetadata?.subtype) {
-      return entryMeta(e).subtype === activity.defaultMetadata.subtype;
-    }
-    return true;
-  }).length;
+export function countTodayForActivity(entries: LogEntry[], activity: ActivityOption): number {
+  const todayKey = localDateKey(new Date());
+  return entries.filter(
+    (e) => entryOnLocalDate(e.started_at, todayKey) && entryMatchesActivity(e, activity),
+  ).length;
 }
 
 const SUBTYPE_LABELS: Record<string, string> = {
@@ -135,8 +104,7 @@ function feedingDetail(entry: LogEntry): string {
 
   if (entry.amount != null) {
     const unit = entry.unit === 'ml' ? 'ml' : (entry.unit ?? 'ml');
-    const label =
-      meta.subtype === 'nutrition' ? 'Expressed milk' : 'Amount';
+    const label = meta.subtype === 'nutrition' ? 'Expressed milk' : 'Amount';
     return `${label}: ${entry.amount} ${unit}`;
   }
 
@@ -164,7 +132,7 @@ export function entryDetailLine(entry: LogEntry): string {
   if (entry.type === 'sleep') return sleepDetail(entry);
   if (entry.type === 'feeding' || entry.type === 'pump') return feedingDetail(entry);
   if (entry.type === 'medication') return entry.notes ?? 'Medication logged';
-  return entry.notes ?? entrySubtitle(entry);
+  return entry.notes ?? `Logged at ${formatTime(entry.started_at)}`;
 }
 
 /** @deprecated use entryDetailLine */

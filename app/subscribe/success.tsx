@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  View,
-} from 'react-native';
+import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Check, Sparkles } from 'lucide-react-native';
 
@@ -13,7 +9,6 @@ import { Text } from '@components/Text';
 import { usePlusActivationPoll } from '@hooks/usePlusActivationPoll';
 import { isEmailConfirmed } from '@lib/auth';
 import { useAuthStore } from '@store/authStore';
-import { useSubscriptionStore } from '@store/subscriptionStore';
 
 export default function SubscribeSuccessScreen() {
   const router = useRouter();

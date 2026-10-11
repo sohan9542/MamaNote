@@ -1,21 +1,16 @@
-export type SubscriptionStatus =
-  | 'free'
-  | 'trialing'
-  | 'active'
-  | 'canceled'
-  | 'past_due';
+export type SubscriptionStatus = 'free' | 'trialing' | 'active' | 'canceled' | 'past_due';
 
 export type SubscriptionPlan = 'monthly' | 'annual' | 'lifetime';
 
 export const PREMIUM_STATUSES: SubscriptionStatus[] = ['active', 'trialing'];
 
-export const PLANS: Array<{
+export const PLANS: {
   id: SubscriptionPlan;
   label: string;
   price: string;
   sublabel: string;
   badge?: string;
-}> = [
+}[] = [
   {
     id: 'annual',
     label: 'Annual',

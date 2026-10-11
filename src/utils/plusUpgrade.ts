@@ -33,18 +33,11 @@ export function handleFreemiumError(error: unknown): boolean {
 export const PLUS_MESSAGES = {
   generateRoutine:
     'AI daily rhythms are part of MamaNote Plus. Subscribe to generate personalized schedules from your logs.',
-  weeklyInsights:
-    'Weekly drill-downs and activity details are part of MamaNote Plus.',
-  addBaby:
-    'Multiple baby profiles are included with MamaNote Plus.',
-  share:
-    'Sharing activity links with family is part of MamaNote Plus.',
-  growthSkills:
-    'Growth & skills tracking is part of MamaNote Plus.',
-  sleepHub:
-    'Sleep timer and schedules are part of MamaNote Plus.',
-  medicineReminders:
-    'Medicine reminders are included with MamaNote Plus.',
-  routinePreview:
-    'AI daily rhythms are part of MamaNote Plus.',
+  weeklyInsights: 'Weekly drill-downs and activity details are part of MamaNote Plus.',
+  addBaby: 'Multiple baby profiles are included with MamaNote Plus.',
+  share: 'Sharing activity links with family is part of MamaNote Plus.',
+  growthSkills: 'Growth & skills tracking is part of MamaNote Plus.',
+  sleepHub: 'Sleep timer and schedules are part of MamaNote Plus.',
+  medicineReminders: 'Medicine reminders are included with MamaNote Plus.',
+  routinePreview: 'AI daily rhythms are part of MamaNote Plus.',
 } as const;

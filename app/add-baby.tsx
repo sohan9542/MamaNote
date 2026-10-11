@@ -7,7 +7,7 @@ import { ScreenBackHeader } from '@components/ScreenBackHeader';
 import { Text } from '@components/Text';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
-import { handleFreemiumError } from '@utils/freemiumError';
+import { handleFreemiumError } from '@utils/plusUpgrade';
 
 export default function AddBabyScreen() {
   const router = useRouter();
@@ -58,8 +58,8 @@ export default function AddBabyScreen() {
         </View>
 
         <Text muted variant="caption" className="mt-6 text-center leading-5">
-          Switch between babies anytime from Home or Profile. Each baby has separate logs,
-          stats, and reminders.
+          Switch between babies anytime from Home or Profile. Each baby has separate logs, stats,
+          and reminders.
         </Text>
       </KeyboardAvoidingView>
     </Screen>

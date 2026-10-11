@@ -1,6 +1,6 @@
 import type { LogEntry } from '@app-types/database';
 import { HOME_ACTIVITIES, type ActivityOption } from '@constants/activities';
-import type { LogMetadata } from '@constants/logFields';
+import { entryMatchesActivity } from '@utils/activityMatch';
 import { entryOnLocalDate, localDateKey } from '@utils/date';
 
 export interface StatsFilter {
@@ -13,14 +13,7 @@ export interface StatsFilter {
   dayCount?: number;
 }
 
-export function entryMatchesActivity(entry: LogEntry, activity: ActivityOption): boolean {
-  if (entry.type !== activity.type) return false;
-  const meta = (entry.metadata ?? {}) as LogMetadata;
-  if (activity.defaultMetadata?.subtype) {
-    return meta.subtype === activity.defaultMetadata.subtype;
-  }
-  return true;
-}
+export { entryMatchesActivity };
 
 export function filterEntriesForStats(entries: LogEntry[], filter: StatsFilter): LogEntry[] {
   let result = entries;
@@ -58,9 +51,7 @@ export function filterEntriesForStats(entries: LogEntry[], filter: StatsFilter):
     });
   }
 
-  return result.sort(
-    (a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime(),
-  );
+  return result.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
 }
 
 export function countForActivityOnDate(
@@ -82,7 +73,11 @@ export function statsFilterTitle(filter: StatsFilter): string {
 
   if (filter.dateKey && activity) {
     const day = new Date(`${filter.dateKey}T12:00:00`);
-    const dayLabel = day.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const dayLabel = day.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
     return `${activity.label} · ${dayLabel}`;
   }
 
@@ -91,8 +86,7 @@ export function statsFilterTitle(filter: StatsFilter): string {
   if (filter.dateKey && filter.dateKeyEnd) {
     const start = new Date(`${filter.dateKey}T12:00:00`);
     const end = new Date(`${filter.dateKeyEnd}T12:00:00`);
-    const fmt = (d: Date) =>
-      d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const fmt = (d: Date) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     return `Activities · ${fmt(start)} – ${fmt(end)}`;
   }
 

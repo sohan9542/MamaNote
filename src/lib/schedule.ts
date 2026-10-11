@@ -1,7 +1,7 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
 import { supabase } from '@lib/supabase';
-import type { GeneratedRoutine, RoutineMeta, RoutineSource } from '@app-types/schedule';
+import type { GeneratedRoutine, RoutineSource } from '@app-types/schedule';
 import { getRoutineMeta, parseGeneratedRoutine } from '@app-types/schedule';
 
 export class PremiumRequiredError extends Error {

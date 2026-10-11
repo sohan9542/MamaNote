@@ -8,7 +8,7 @@ import { useTheme } from '@hooks/useTheme';
 import { FontFamily } from '@constants/fonts';
 
 /** Visible tabs left → right. Log is hidden; FAB sits in the center slot. */
-const TAB_ORDER = ['index', 'stats', 'profile'] as const;
+type TabRouteName = 'index' | 'stats' | 'profile';
 
 const FAB_SIZE = 48;
 
@@ -31,16 +31,14 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
     }
   };
 
-  const renderTab = (routeName: (typeof TAB_ORDER)[number]) => {
+  const renderTab = (routeName: TabRouteName) => {
     const route = state.routes.find((r) => r.name === routeName);
     if (!route) return <View style={{ flex: 1 }} />;
 
     const index = state.routes.indexOf(route);
     const { options } = descriptors[route.key];
     const label =
-      typeof options.tabBarLabel === 'string'
-        ? options.tabBarLabel
-        : (options.title ?? route.name);
+      typeof options.tabBarLabel === 'string' ? options.tabBarLabel : (options.title ?? route.name);
     const isFocused = state.index === index;
     const color = isFocused ? colors.tabBarActive : colors.tabBarInactive;
     const Icon = options.tabBarIcon;
@@ -60,7 +58,13 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
       >
         {Icon ? Icon({ focused: isFocused, color, size: 24 }) : null}
         <Text
-          style={{ fontSize: 11, fontWeight: '600', color, marginTop: 4, fontFamily: FontFamily.medium }}
+          style={{
+            fontSize: 11,
+            fontWeight: '600',
+            color,
+            marginTop: 4,
+            fontFamily: FontFamily.medium,
+          }}
         >
           {label}
         </Text>

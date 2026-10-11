@@ -11,7 +11,7 @@ import type { ActivityOption } from '@constants/activities';
 import type { LogMetadata } from '@constants/logFields';
 import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
-import { handleFreemiumError } from '@utils/freemiumError';
+import { handleFreemiumError } from '@utils/plusUpgrade';
 import { initialSleepLogState, resolveSleepEntryTimes, type SleepLogState } from '@utils/sleepLog';
 import { cn } from '@utils/cn';
 
@@ -37,12 +37,7 @@ interface Props {
   showActions?: boolean;
 }
 
-export function LogActivityForm({
-  activity,
-  onSaved,
-  onCancel,
-  showActions = true,
-}: Props) {
+export function LogActivityForm({ activity, onSaved, onCancel, showActions = true }: Props) {
   const user = useAuthStore((s) => s.user);
   const activeBabyId = useBabyStore((s) => s.activeBabyId);
   const addEntry = useBabyStore((s) => s.addEntry);
