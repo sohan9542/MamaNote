@@ -15,7 +15,7 @@ const SECTIONS: PrivacySection[] = [
   {
     title: 'Overview',
     body: [
-      'MamaNote helps you track your baby\'s daily care. We take privacy seriously and only collect what is needed to run the app.',
+      "MamaNote helps you track your baby's daily care. We take privacy seriously and only collect what is needed to run the app.",
       'This policy describes what we store, where it lives, and the choices you have.',
     ],
   },
@@ -23,7 +23,7 @@ const SECTIONS: PrivacySection[] = [
     title: 'Information we collect',
     body: [
       'Account details — your email address and name when you sign up.',
-      'Baby profile — your baby\'s name, birth date, and optional gender.',
+      "Baby profile — your baby's name, birth date, and optional gender.",
       'Activity logs — sleep, feeding, diapers, medicine, pumping, nutrition, and notes you record.',
       'Subscription status — whether you have MamaNote Plus, managed through Paddle.',
       'Share links — if you create a share link, selected activities can be viewed by anyone with that link until you revoke it.',
@@ -58,7 +58,7 @@ const SECTIONS: PrivacySection[] = [
     body: [
       'MamaNote uses local notifications on your device for medicine reminders only.',
       'We do not send marketing push notifications.',
-      'You can turn notifications off anytime in your phone\'s Settings.',
+      "You can turn notifications off anytime in your phone's Settings.",
     ],
   },
   {
@@ -73,7 +73,7 @@ const SECTIONS: PrivacySection[] = [
   {
     title: 'Security',
     body: [
-      'Your data is protected by row-level security in Supabase so only you can access your account\'s records.',
+      "Your data is protected by row-level security in Supabase so only you can access your account's records.",
       'Share links use unguessable tokens and only expose the categories you choose.',
     ],
   },
@@ -89,10 +89,7 @@ const SECTIONS: PrivacySection[] = [
 export default function PrivacyScreen() {
   return (
     <Screen scroll contentClassName="pb-10">
-      <ScreenBackHeader
-        title="Privacy"
-        subtitle="How MamaNote handles your data"
-      />
+      <ScreenBackHeader title="Privacy" subtitle="How MamaNote handles your data" />
 
       <Card tone="mint" className="mb-5 gap-2">
         <Text variant="subtitle" className="font-semibold">

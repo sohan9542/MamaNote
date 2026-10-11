@@ -52,6 +52,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   signOut: async () => {
     await supabase.auth.signOut();
-    set({ session: null, user: null, pendingVerificationEmail: null, pendingPasswordResetEmail: null });
+    set({
+      session: null,
+      user: null,
+      pendingVerificationEmail: null,
+      pendingPasswordResetEmail: null,
+    });
   },
 }));

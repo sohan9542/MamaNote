@@ -128,10 +128,7 @@ const QUICK_LABEL_METADATA: Record<string, LogMetadata> = {
 };
 
 /** Map home quick-action label → log preset metadata */
-export function metadataFromQuickLabel(
-  _type: LogEntryType,
-  quickLabel?: string,
-): LogMetadata {
+export function metadataFromQuickLabel(_type: LogEntryType, quickLabel?: string): LogMetadata {
   if (!quickLabel) return {};
   return QUICK_LABEL_METADATA[quickLabel] ?? {};
 }

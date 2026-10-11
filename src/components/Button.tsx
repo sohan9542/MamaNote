@@ -1,11 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  View,
-  type PressableProps,
-} from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, type PressableProps } from 'react-native';
 
 import { cn } from '@utils/cn';
 import { FontFamily } from '@constants/fonts';
@@ -24,12 +18,9 @@ interface ButtonProps extends Omit<PressableProps, 'children'> {
 }
 
 const CONTAINER: Record<Variant, string> = {
-  primary:
-    'bg-pink-400 active:bg-pink-500 dark:bg-pink-300 dark:active:bg-pink-400',
-  secondary:
-    'bg-lavender-200 active:bg-lavender-300 dark:bg-ink-600 dark:active:bg-ink-500',
-  ghost:
-    'bg-transparent active:bg-pink-100 dark:active:bg-ink-700',
+  primary: 'bg-pink-400 active:bg-pink-500 dark:bg-pink-300 dark:active:bg-pink-400',
+  secondary: 'bg-lavender-200 active:bg-lavender-300 dark:bg-ink-600 dark:active:bg-ink-500',
+  ghost: 'bg-transparent active:bg-pink-100 dark:active:bg-ink-700',
   danger: 'bg-pink-500 active:bg-pink-600',
 };
 
@@ -84,7 +75,9 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' || variant === 'danger' ? '#fff' : '#322C44'} />
+        <ActivityIndicator
+          color={variant === 'primary' || variant === 'danger' ? '#fff' : '#322C44'}
+        />
       ) : (
         <>
           {leftIcon}

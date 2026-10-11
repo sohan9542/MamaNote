@@ -1,13 +1,5 @@
 import type { LucideIcon } from 'lucide-react-native';
-import {
-  Baby,
-  Blocks,
-  Milk,
-  Moon,
-  Shirt,
-  Sparkles,
-  UtensilsCrossed,
-} from 'lucide-react-native';
+import { Baby, Blocks, Milk, Moon, Shirt, Sparkles, UtensilsCrossed } from 'lucide-react-native';
 
 export type Milestone = {
   id: string;
@@ -196,12 +188,7 @@ export const MILESTONES: Milestone[] = [
     title: '9 – 10 months',
     funTitle: 'Cruise control',
     emoji: '🚶',
-    skills: [
-      'Cruises along furniture',
-      'Claps hands',
-      'Points to request',
-      'Imitates sounds',
-    ],
+    skills: ['Cruises along furniture', 'Claps hands', 'Points to request', 'Imitates sounds'],
     icon: Baby,
     ringColor: '#F472B6',
     bgColor: '#FCE7F3',

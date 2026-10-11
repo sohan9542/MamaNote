@@ -45,9 +45,7 @@ export async function fetchSharedActivities(token: string): Promise<SharedActivi
   const res = await fetch(
     `${supabaseUrl}/functions/v1/get-shared-activities?token=${encodeURIComponent(token)}`,
     {
-      headers: anonKey
-        ? { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
-        : undefined,
+      headers: anonKey ? { apikey: anonKey, Authorization: `Bearer ${anonKey}` } : undefined,
     },
   );
 

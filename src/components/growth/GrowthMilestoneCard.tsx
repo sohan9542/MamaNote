@@ -43,8 +43,10 @@ function GrowthMilestoneCardComponent({
         onPress={handleHeaderPress}
         className={cn(
           'w-full flex-row items-center gap-3 border-2 bg-white p-4 dark:bg-ink-800',
-          expanded ? 'rounded-t-3xl rounded-b-none border-b-0' : 'rounded-3xl',
-          isCurrent ? 'border-violet-300 dark:border-violet-600' : 'border-ink-100 dark:border-ink-600',
+          expanded ? 'rounded-b-none rounded-t-3xl border-b-0' : 'rounded-3xl',
+          isCurrent
+            ? 'border-violet-300 dark:border-violet-600'
+            : 'border-ink-100 dark:border-ink-600',
         )}
       >
         <View
@@ -87,7 +89,9 @@ function GrowthMilestoneCardComponent({
         <View
           className={cn(
             'w-full gap-3 rounded-b-3xl border-2 border-t-0 bg-white px-4 pb-4 pt-2 dark:bg-ink-800',
-            isCurrent ? 'border-violet-300 dark:border-violet-600' : 'border-ink-100 dark:border-ink-600',
+            isCurrent
+              ? 'border-violet-300 dark:border-violet-600'
+              : 'border-ink-100 dark:border-ink-600',
           )}
         >
           {isCurrent ? (

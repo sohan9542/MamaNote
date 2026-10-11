@@ -1,9 +1,7 @@
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Modal, Platform, Pressable, View } from 'react-native';
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
+import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Calendar } from 'lucide-react-native';
 
 import { Text } from './Text';

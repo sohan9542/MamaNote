@@ -36,9 +36,7 @@ export function ActivityMiniChart({ data, periodLabel, onPress }: Props) {
             isDark ? 'bg-ink-800/90' : 'bg-white/80',
           )}
         >
-          {Icon ? (
-            <Icon size={16} color={data.color} strokeWidth={2} />
-          ) : null}
+          {Icon ? <Icon size={16} color={data.color} strokeWidth={2} /> : null}
         </View>
         <Text
           variant="caption"
@@ -58,10 +56,7 @@ export function ActivityMiniChart({ data, periodLabel, onPress }: Props) {
         </Text>
       </View>
 
-      <Text
-        variant="caption"
-        className="text-center text-ink-500 dark:text-ink-300"
-      >
+      <Text variant="caption" className="text-center text-ink-500 dark:text-ink-300">
         {periodLabel}
       </Text>
     </>

@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 import { PLUS_MESSAGES, promptPlusUpgrade } from '@utils/plusUpgrade';
-import {
-  FlatList,
-  Pressable,
-  View,
-  type ListRenderItem,
-} from 'react-native';
+import { FlatList, Pressable, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Sparkles } from 'lucide-react-native';
@@ -51,16 +46,10 @@ export default function GrowthSkillsScreen() {
   const hydrateForBaby = useGrowthStore((s) => s.hydrateForBaby);
   const toggleSkill = useGrowthStore((s) => s.toggleSkill);
   const completedSkills = useCompletedSkills(activeBaby?.id ?? null);
-  const completedSet = useMemo(
-    () => completedSkillsToSet(completedSkills),
-    [completedSkills],
-  );
+  const completedSet = useMemo(() => completedSkillsToSet(completedSkills), [completedSkills]);
 
   const ageMonths = activeBaby ? babyAgeInMonths(activeBaby.birth_date) : 0;
-  const currentMilestone = useMemo(
-    () => getMilestoneForAgeMonths(ageMonths),
-    [ageMonths],
-  );
+  const currentMilestone = useMemo(() => getMilestoneForAgeMonths(ageMonths), [ageMonths]);
 
   const [expandedId, setExpandedId] = useState<string | null>(currentMilestone.id);
   const [toast, setToast] = useState<string | null>(null);
@@ -106,11 +95,10 @@ export default function GrowthSkillsScreen() {
         const cheerMsg = SKILL_CHEERS[Math.floor(Math.random() * SKILL_CHEERS.length)];
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-        const doneAfter =
-          milestone.skills.filter((_, i) => {
-            if (i === skillIndex) return true;
-            return completedSet.has(skillToken(milestoneId, i));
-          }).length;
+        const doneAfter = milestone.skills.filter((_, i) => {
+          if (i === skillIndex) return true;
+          return completedSet.has(skillToken(milestoneId, i));
+        }).length;
 
         if (doneAfter === milestone.skills.length) {
           showToast(`Chapter complete: ${milestone.funTitle}! 🎉`);
@@ -166,19 +154,17 @@ export default function GrowthSkillsScreen() {
         </Text>
       </View>
     );
-  }, [
-    activeBaby,
-    completedSkills.length,
-    currentMilestone.funTitle,
-    currentMilestone.emoji,
-  ]);
+  }, [activeBaby, completedSkills.length, currentMilestone.funTitle, currentMilestone.emoji]);
 
   const listFooter = useMemo(
     () => (
       <View className="mb-8 mt-2 px-5">
         <View className="w-full items-center rounded-3xl bg-violet-100 px-6 py-5 dark:bg-violet-950/50">
           <Text className="text-2xl">🌈</Text>
-          <Text variant="subtitle" className="mt-2 text-center font-bold text-violet-800 dark:text-violet-100">
+          <Text
+            variant="subtitle"
+            className="mt-2 text-center font-bold text-violet-800 dark:text-violet-100"
+          >
             Every skill counts
           </Text>
           <Text variant="caption" muted className="mt-1 text-center leading-5">
@@ -212,7 +198,7 @@ export default function GrowthSkillsScreen() {
             className="mb-2 flex-row items-center gap-1.5 self-start rounded-full bg-white/20 px-3 py-1"
           >
             <ChevronLeft size={18} color="#fff" />
-            <Text className="text-sm font-semibold text-white">Done</Text>
+            <Text className="font-semibold text-sm text-white">Done</Text>
           </Pressable>
 
           <View className="flex-row items-center gap-2">
@@ -225,7 +211,7 @@ export default function GrowthSkillsScreen() {
 
           {toast ? (
             <View className="mt-2 self-center rounded-full bg-white/95 px-4 py-1.5">
-              <Text className="text-center text-xs font-semibold text-violet-700">{toast}</Text>
+              <Text className="text-center font-semibold text-xs text-violet-700">{toast}</Text>
             </View>
           ) : null}
         </View>

@@ -47,9 +47,7 @@ export default function SharedActivitiesScreen() {
     <Screen scroll contentClassName="pb-10">
       <View className="mb-6 flex-row items-center gap-3">
         <Pressable
-          onPress={() =>
-            router.canGoBack() ? router.back() : router.replace('/(auth)/sign-in')
-          }
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/sign-in'))}
           className="h-10 w-10 items-center justify-center rounded-full bg-ink-50 dark:bg-ink-700"
         >
           <ChevronLeft size={22} color="#9CA3AF" />
@@ -120,9 +118,7 @@ export default function SharedActivitiesScreen() {
               </View>
             ) : (
               payload.entries.map((entry) => {
-                const activity = entry.activityId
-                  ? getActivityById(entry.activityId)
-                  : undefined;
+                const activity = entry.activityId ? getActivityById(entry.activityId) : undefined;
                 const Icon = activity?.icon;
                 const iconColor = activity?.iconColor ?? '#FB7185';
                 const bg = activity?.bg ?? '#FDF2F8';

@@ -1,5 +1,5 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import {
   corsPreflightResponse,
   extractUserId,
@@ -8,7 +8,7 @@ import {
   mapPaddleStatus,
   verifyPaddleWebhook,
   type SubscriptionPlan,
-} from "../_shared/paddle.ts";
+} from '../_shared/paddle.ts';
 
 type PaddleSubscription = {
   id: string;
@@ -28,7 +28,7 @@ type PaddleTransaction = {
   items?: Array<{ price?: { id?: string; billing_cycle?: unknown } }>;
 };
 
-const PAID_PREMIUM_STATUSES = new Set(["active", "trialing"]);
+const PAID_PREMIUM_STATUSES = new Set(['active', 'trialing']);
 
 async function upsertEntitlement(
   serviceClient: ReturnType<typeof createClient>,
@@ -43,21 +43,19 @@ async function upsertEntitlement(
 ) {
   const clearComplimentaryTrial = PAID_PREMIUM_STATUSES.has(patch.status);
 
-  const { error } = await serviceClient.from("subscriptions").upsert(
+  const { error } = await serviceClient.from('subscriptions').upsert(
     {
       user_id: userId,
       status: patch.status,
       plan: patch.plan ?? null,
-      provider: "paddle",
+      provider: 'paddle',
       paddle_customer_id: patch.paddle_customer_id ?? null,
       paddle_subscription_id: patch.paddle_subscription_id ?? null,
       current_period_end: patch.current_period_end ?? null,
-      ...(clearComplimentaryTrial
-        ? { complimentary_premium_until: null }
-        : {}),
+      ...(clearComplimentaryTrial ? { complimentary_premium_until: null } : {}),
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "user_id" },
+    { onConflict: 'user_id' },
   );
   if (error) throw new Error(error.message);
 }
@@ -69,7 +67,7 @@ async function handleSubscriptionEvent(
 ) {
   const userId = extractUserId(sub.custom_data);
   if (!userId) {
-    console.warn("subscription event missing supabase_user_id", sub.id);
+    console.warn('subscription event missing supabase_user_id', sub.id);
     return;
   }
 
@@ -91,7 +89,7 @@ async function handleTransactionCompleted(
 ) {
   const userId = extractUserId(txn.custom_data);
   if (!userId) {
-    console.warn("transaction event missing supabase_user_id", txn.id);
+    console.warn('transaction event missing supabase_user_id', txn.id);
     return;
   }
 
@@ -102,11 +100,11 @@ async function handleTransactionCompleted(
   const isRecurring = billingCycle != null;
   if (isRecurring) return;
 
-  const plan = priceId ? inferPlanFromPriceId(priceId) : "lifetime";
+  const plan = priceId ? inferPlanFromPriceId(priceId) : 'lifetime';
 
   await upsertEntitlement(serviceClient, userId, {
-    status: "active",
-    plan: plan ?? "lifetime",
+    status: 'active',
+    plan: plan ?? 'lifetime',
     paddle_customer_id: txn.customer_id ?? null,
     paddle_subscription_id: null,
     current_period_end: null,
@@ -114,23 +112,23 @@ async function handleTransactionCompleted(
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return corsPreflightResponse();
+  if (req.method === 'OPTIONS') return corsPreflightResponse();
 
   try {
-    const webhookSecret = Deno.env.get("PADDLE_WEBHOOK_SECRET");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const webhookSecret = Deno.env.get('PADDLE_WEBHOOK_SECRET');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!webhookSecret || !supabaseUrl || !serviceKey) {
-      return jsonResponse({ error: "Server misconfigured" }, 500);
+      return jsonResponse({ error: 'Server misconfigured' }, 500);
     }
 
     const rawBody = await req.text();
-    const signature = req.headers.get("paddle-signature") ?? "";
+    const signature = req.headers.get('paddle-signature') ?? '';
 
     const valid = await verifyPaddleWebhook(rawBody, signature, webhookSecret);
     if (!valid) {
-      return jsonResponse({ error: "Invalid signature" }, 400);
+      return jsonResponse({ error: 'Invalid signature' }, 400);
     }
 
     const event = JSON.parse(rawBody) as {
@@ -141,17 +139,14 @@ Deno.serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, serviceKey);
 
     switch (event.event_type) {
-      case "subscription.created":
-      case "subscription.updated":
-      case "subscription.activated":
-      case "subscription.trialing":
-        await handleSubscriptionEvent(
-          serviceClient,
-          event.data as PaddleSubscription,
-        );
+      case 'subscription.created':
+      case 'subscription.updated':
+      case 'subscription.activated':
+      case 'subscription.trialing':
+        await handleSubscriptionEvent(serviceClient, event.data as PaddleSubscription);
         break;
-      case "subscription.canceled":
-      case "subscription.past_due": {
+      case 'subscription.canceled':
+      case 'subscription.past_due': {
         const sub = event.data as PaddleSubscription;
         const userId = extractUserId(sub.custom_data);
         if (userId) {
@@ -164,19 +159,16 @@ Deno.serve(async (req) => {
         }
         break;
       }
-      case "transaction.completed":
-        await handleTransactionCompleted(
-          serviceClient,
-          event.data as PaddleTransaction,
-        );
+      case 'transaction.completed':
+        await handleTransactionCompleted(serviceClient, event.data as PaddleTransaction);
         break;
       default:
-        console.log("Unhandled Paddle event:", event.event_type);
+        console.log('Unhandled Paddle event:', event.event_type);
     }
 
     return jsonResponse({ ok: true });
   } catch (e) {
-    console.error("paddle-webhook error:", e);
+    console.error('paddle-webhook error:', e);
     return jsonResponse({ error: (e as Error).message }, 500);
   }
 });

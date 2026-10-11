@@ -22,11 +22,17 @@ export function RoutinePreviewCard({ routine, onPress }: Props) {
           <Text className="text-2xl">✨</Text>
         </View>
         <View className="flex-1">
-          <Text variant="subtitle" className="text-base font-bold text-lavender-800 dark:text-lavender-200">
+          <Text
+            variant="subtitle"
+            className="text-lavender-800 text-base font-bold dark:text-lavender-200"
+          >
             Today&apos;s rhythm
           </Text>
           {next ? (
-            <Text variant="caption" className="text-[13px] leading-4 text-ink-500 dark:text-ink-300">
+            <Text
+              variant="caption"
+              className="text-[13px] leading-4 text-ink-500 dark:text-ink-300"
+            >
               Up next: {next.label} · {next.startTime}
             </Text>
           ) : null}

@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  PLUS_ACTIVATION_POLL_MS,
-  PLUS_ACTIVATION_TIMEOUT_MS,
-} from '@lib/subscription';
+import { PLUS_ACTIVATION_POLL_MS, PLUS_ACTIVATION_TIMEOUT_MS } from '@lib/subscription';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 
 export type PlusActivationPhase = 'activating' | 'active' | 'timeout';

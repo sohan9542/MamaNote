@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { Alert, View } from 'react-native';
 
 import { Button } from './Button';
-import {
-  DatePickerField,
-  defaultBabyBirthDate,
-  toBirthDateString,
-} from './DatePickerField';
+import { DatePickerField, defaultBabyBirthDate, toBirthDateString } from './DatePickerField';
 import { Input } from './Input';
 import { Text } from './Text';
 
@@ -15,10 +11,7 @@ interface AddBabyFormProps {
   onSubmit: (payload: { name: string; birthDate: string }) => Promise<void>;
 }
 
-export function AddBabyForm({
-  submitLabel = 'Save baby',
-  onSubmit,
-}: AddBabyFormProps) {
+export function AddBabyForm({ submitLabel = 'Save baby', onSubmit }: AddBabyFormProps) {
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState(defaultBabyBirthDate);
   const [loading, setLoading] = useState(false);

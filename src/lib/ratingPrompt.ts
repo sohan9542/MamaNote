@@ -1,9 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  RATING_PROMPT_AFTER_LOGS,
-  RATING_PROMPT_COOLDOWN_DAYS,
-} from '@constants/ratingPrompt';
+import { RATING_PROMPT_AFTER_LOGS, RATING_PROMPT_COOLDOWN_DAYS } from '@constants/ratingPrompt';
 import { supabase } from '@lib/supabase';
 import { useSubscriptionStore } from '@store/subscriptionStore';
 
@@ -27,10 +24,7 @@ async function countUserLogs(userId: string): Promise<number> {
 }
 
 /** After 5 saved logs (DB total), ask for a store rating once per cooldown. */
-export async function trackLogSavedForRating(
-  userId: string,
-  onPrompt: () => void,
-): Promise<void> {
+export async function trackLogSavedForRating(userId: string, onPrompt: () => void): Promise<void> {
   if (useSubscriptionStore.getState().hasPaidPremium()) return;
 
   const lastShown = await readPromptShownAt();

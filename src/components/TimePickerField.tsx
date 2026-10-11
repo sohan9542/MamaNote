@@ -1,9 +1,7 @@
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { Modal, Platform, Pressable, View } from 'react-native';
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
+import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Clock } from 'lucide-react-native';
 
 import { Text } from './Text';
@@ -17,12 +15,7 @@ interface TimePickerFieldProps {
   error?: string;
 }
 
-export function TimePickerField({
-  label = 'Time',
-  value,
-  onChange,
-  error,
-}: TimePickerFieldProps) {
+export function TimePickerField({ label = 'Time', value, onChange, error }: TimePickerFieldProps) {
   const { isDark } = useTheme();
   const [open, setOpen] = useState(false);
   const [tempTime, setTempTime] = useState(value);
@@ -80,12 +73,7 @@ export function TimePickerField({
       ) : null}
 
       {Platform.OS === 'android' && open ? (
-        <DateTimePicker
-          value={tempTime}
-          mode="time"
-          display="default"
-          onChange={handleChange}
-        />
+        <DateTimePicker value={tempTime} mode="time" display="default" onChange={handleChange} />
       ) : null}
 
       {Platform.OS === 'ios' && open ? (

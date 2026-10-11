@@ -16,7 +16,7 @@ export const CHANGELOG: ChangelogItem[] = [
       '13 home activities including bottle, bath, tummy time, growth, doctor visits, and playtime',
       'Quick access on Home for Growth & Skills and Sleep',
       'Track sleep, feeding, medicine, pumping, nutrition, and diapers',
-      'AI daily rhythm based on your baby\'s recent activity',
+      "AI daily rhythm based on your baby's recent activity",
       'Medicine reminders so you never miss a dose',
       'Share activity logs with family via a secure link',
       'Insights with daily stats and weekly overview charts',

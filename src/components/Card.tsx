@@ -20,7 +20,7 @@ export function Card({ children, tone = 'default', className, ...rest }: CardPro
   return (
     <View
       className={cn(
-        'rounded-3xl p-5 border border-ink-100/40 dark:border-ink-600/60',
+        'rounded-3xl border border-ink-100/40 p-5 dark:border-ink-600/60',
         TONES[tone],
         className,
       )}

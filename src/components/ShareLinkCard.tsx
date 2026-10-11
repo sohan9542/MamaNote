@@ -62,24 +62,28 @@ export function ShareLinkCard({ url, filterLabel, entryCount, expiresLabel }: Pr
       </Text>
 
       <View className="w-full rounded-2xl border border-ink-100/80 bg-ink-50 px-4 py-3 dark:border-ink-600 dark:bg-ink-700">
-        <Text variant="caption" className="font-mono text-xs leading-5 text-ink-700 dark:text-ink-100">
+        <Text
+          variant="caption"
+          className="font-mono text-xs leading-5 text-ink-700 dark:text-ink-100"
+        >
           {url}
         </Text>
       </View>
 
       <View className="w-full gap-3">
-        <Button onPress={handleShare} size="lg" fullWidth leftIcon={<Share2 size={18} color="#fff" />}>
+        <Button
+          onPress={handleShare}
+          size="lg"
+          fullWidth
+          leftIcon={<Share2 size={18} color="#fff" />}
+        >
           Share link
         </Button>
         <Pressable
           onPress={handleCopy}
           className="flex-row items-center justify-center gap-2 rounded-2xl border border-ink-100/80 py-3 dark:border-ink-600"
         >
-          {copied ? (
-            <Check size={16} color="#16A34A" />
-          ) : (
-            <Copy size={16} color="#7C3AED" />
-          )}
+          {copied ? <Check size={16} color="#16A34A" /> : <Copy size={16} color="#7C3AED" />}
           <Text variant="caption" className="font-semibold">
             {copied ? 'Copied!' : 'Copy link'}
           </Text>

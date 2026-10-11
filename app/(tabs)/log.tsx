@@ -22,9 +22,7 @@ export default function LogScreen() {
   const params = useLocalSearchParams<{ type?: string; note?: string; activityId?: string }>();
 
   const initialActivity =
-    (params.activityId
-      ? HOME_ACTIVITIES.find((a) => a.id === params.activityId)
-      : undefined) ??
+    (params.activityId ? HOME_ACTIVITIES.find((a) => a.id === params.activityId) : undefined) ??
     resolveActivityFromParams(params.type, params.note);
 
   const [selected, setSelected] = useState<ActivityOption | null>(
@@ -41,9 +39,7 @@ export default function LogScreen() {
   }, [params.type, params.note, params.activityId]);
 
   const handleSaved = () => {
-    Alert.alert('Saved', 'Activity logged.', [
-      { text: 'OK', onPress: () => router.back() },
-    ]);
+    Alert.alert('Saved', 'Activity logged.', [{ text: 'OK', onPress: () => router.back() }]);
   };
 
   if (!selected) {

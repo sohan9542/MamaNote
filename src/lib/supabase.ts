@@ -16,8 +16,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // AsyncStorage doesn't exist in the web SSR pass; guard so static export works.
-const storage =
-  Platform.OS === 'web' && typeof window === 'undefined' ? undefined : AsyncStorage;
+const storage = Platform.OS === 'web' && typeof window === 'undefined' ? undefined : AsyncStorage;
 
 export const supabase: SupabaseClient<Database> = createClient<Database>(
   supabaseUrl ?? 'http://localhost',

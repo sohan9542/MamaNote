@@ -123,10 +123,7 @@ export default function RoutineScreen() {
           </View>
 
           <View className="mb-6">
-            <RoutineNextCards
-              feed={routine.nextFeedWindow}
-              sleep={routine.nextSleepWindow}
-            />
+            <RoutineNextCards feed={routine.nextFeedWindow} sleep={routine.nextSleepWindow} />
           </View>
 
           <View className="mb-6">
@@ -139,7 +136,6 @@ export default function RoutineScreen() {
           <RoutineBlockList routine={routine} compact />
         </>
       )}
-
     </Screen>
   );
 }

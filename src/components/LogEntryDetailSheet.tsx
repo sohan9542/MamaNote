@@ -23,10 +23,7 @@ import { entryDetailLine, entryDisplayTitle } from '@utils/baby';
 import { formatDate, formatTime } from '@utils/date';
 import { initialSleepLogState, resolveSleepEntryTimes, type SleepLogState } from '@utils/sleepLog';
 import { formatMedicineTime } from '@utils/medicineTime';
-import {
-  findMatchingRemindersForMedicine,
-  medicineNameFromEntry,
-} from '@utils/medicineReminder';
+import { findMatchingRemindersForMedicine, medicineNameFromEntry } from '@utils/medicineReminder';
 import type { LogEntry } from '@app-types/database';
 import type { MedicineReminder } from '@app-types/medicineReminder';
 
@@ -60,9 +57,7 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
   const babyReminders = useMedicineReminderStore((s) =>
     babyId ? (s.remindersByBaby[babyId] ?? EMPTY_REMINDERS) : EMPTY_REMINDERS,
   );
-  const deleteRemindersForMedicine = useMedicineReminderStore(
-    (s) => s.deleteRemindersForMedicine,
-  );
+  const deleteRemindersForMedicine = useMedicineReminderStore((s) => s.deleteRemindersForMedicine);
   const saveReminder = useMedicineReminderStore((s) => s.saveReminder);
 
   const [metadata, setMetadata] = useState<LogMetadata>({});
@@ -105,9 +100,7 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
   const isTemp = entry?.type === 'note' && metadata.subtype === 'temperature';
   const isMedicine = entry?.type === 'medication';
   const showAmount =
-    entry?.type === 'pump' ||
-    metadata.subtype === 'nutrition' ||
-    metadata.subtype === 'bottle';
+    entry?.type === 'pump' || metadata.subtype === 'nutrition' || metadata.subtype === 'bottle';
 
   const matchingReminders = useMemo(() => {
     if (!isMedicine || !entry) return EMPTY_REMINDERS;
@@ -118,7 +111,11 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
   const reminderEnabled = matchingReminders.some((r) => r.enabled);
 
   const reminderTimesLabel = useMemo(
-    () => matchingReminders.flatMap((r) => r.times).map(formatMedicineTime).join(', '),
+    () =>
+      matchingReminders
+        .flatMap((r) => r.times)
+        .map(formatMedicineTime)
+        .join(', '),
     [matchingReminders],
   );
 
@@ -203,29 +200,29 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
         ? 'This will remove the activity and stop its medicine reminders.'
         : 'This cannot be undone.',
       [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          setDeleting(true);
-          try {
-            if (hasReminder) {
-              const name = medicineNameFromEntry(entry.notes, entry.metadata as LogMetadata);
-              await deleteRemindersForMedicine(entry.baby_id, name);
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              if (hasReminder) {
+                const name = medicineNameFromEntry(entry.notes, entry.metadata as LogMetadata);
+                await deleteRemindersForMedicine(entry.baby_id, name);
+              }
+              await deleteEntry(entry.id);
+              await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              onUpdated();
+              onClose();
+            } catch (error) {
+              Alert.alert('Could not delete', (error as Error).message);
+            } finally {
+              setDeleting(false);
             }
-            await deleteEntry(entry.id);
-            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            onUpdated();
-            onClose();
-          } catch (error) {
-            Alert.alert('Could not delete', (error as Error).message);
-          } finally {
-            setDeleting(false);
-          }
+          },
         },
-      },
-    ],
+      ],
     );
   };
 
@@ -316,7 +313,10 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
             <View className="gap-5 pb-4">
               {isMedicine && matchingReminders.length > 0 && (
                 <View className="rounded-2xl border border-amber-200/80 bg-amber-50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/30">
-                  <Text variant="caption" className="font-semibold text-amber-900 dark:text-amber-100">
+                  <Text
+                    variant="caption"
+                    className="font-semibold text-amber-900 dark:text-amber-100"
+                  >
                     {reminderEnabled ? 'Reminder active' : 'Reminder paused'}
                   </Text>
                   <Text variant="caption" muted className="mt-1">
@@ -362,7 +362,9 @@ export function LogEntryDetailSheet({ entry, visible, onClose, onUpdated }: Prop
                       {(['left', 'right', 'both'] as const).map((side) => (
                         <OptionChip
                           key={side}
-                          label={side === 'both' ? 'Both' : side.charAt(0).toUpperCase() + side.slice(1)}
+                          label={
+                            side === 'both' ? 'Both' : side.charAt(0).toUpperCase() + side.slice(1)
+                          }
                           selected={metadata.side === side}
                           onPress={() =>
                             setMetadata((m) => ({ ...m, side, subtype: 'breastfeeding' }))

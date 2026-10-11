@@ -12,8 +12,4 @@ export const POST_TRIAL_TIER_SUMMARY = [
   'Sleep, growth, sharing & insights require Plus',
 ] as const;
 
-export type FreemiumLimitCode =
-  | 'daily_logs'
-  | 'baby_profiles'
-  | 'share_links'
-  | 'full_insights';
+export type FreemiumLimitCode = 'daily_logs' | 'baby_profiles' | 'share_links' | 'full_insights';

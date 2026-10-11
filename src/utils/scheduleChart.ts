@@ -121,11 +121,7 @@ function buildDailyTrendPoints(entries: LogEntry[], dayCount: number): TrendChar
   }));
 }
 
-function buildDailyTrendInRange(
-  entries: LogEntry[],
-  start: Date,
-  end: Date,
-): TrendChartPoint[] {
+function buildDailyTrendInRange(entries: LogEntry[], start: Date, end: Date): TrendChartPoint[] {
   const points: TrendChartPoint[] = [];
   const cursor = new Date(start);
   cursor.setHours(0, 0, 0, 0);
@@ -153,8 +149,7 @@ function buildDailyTrendInRange(
       };
     });
 
-    const useShort =
-      endDay.getTime() - start.getTime() > 14 * 24 * 60 * 60 * 1000;
+    const useShort = endDay.getTime() - start.getTime() > 14 * 24 * 60 * 60 * 1000;
     const label = useShort
       ? cursor.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
       : cursor.toLocaleDateString(undefined, { weekday: 'short' });
@@ -263,17 +258,11 @@ export function weekDateKeyEnd(weekStartKey: string): string {
   return localDateKey(d);
 }
 
-export function buildWeeklyLineChartData(
-  entries: LogEntry[],
-  dayCount = 7,
-): TrendChartPoint[] {
+export function buildWeeklyLineChartData(entries: LogEntry[], dayCount = 7): TrendChartPoint[] {
   return buildDailyTrendPoints(entries, dayCount);
 }
 
-export function buildActivityMiniCharts(
-  entries: LogEntry[],
-  dayCount = 7,
-): ActivityDayCount[] {
+export function buildActivityMiniCharts(entries: LogEntry[], dayCount = 7): ActivityDayCount[] {
   const weekly = buildWeeklyChartData(entries, dayCount);
 
   return HOME_ACTIVITIES.map((activity) => ({
@@ -281,8 +270,8 @@ export function buildActivityMiniCharts(
     type: activity.type,
     label: activity.label,
     color: activity.iconColor,
-    counts: weekly.map((day) =>
-      day.blocks.filter((block) => block.activityId === activity.id).length,
+    counts: weekly.map(
+      (day) => day.blocks.filter((block) => block.activityId === activity.id).length,
     ),
   }));
 }

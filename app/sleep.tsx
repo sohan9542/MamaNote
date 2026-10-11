@@ -73,10 +73,7 @@ function SelectChip({
     >
       <Text
         variant="caption"
-        className={cn(
-          'font-bold',
-          selected ? 'text-white' : 'text-ink-700 dark:text-ink-100',
-        )}
+        className={cn('font-bold', selected ? 'text-white' : 'text-ink-700 dark:text-ink-100')}
       >
         {label}
       </Text>
@@ -119,9 +116,7 @@ export default function SleepScreen() {
   const [wakeTime, setWakeTime] = useState(DEFAULT_SCHEDULE.wakeTime);
   const [bedtime, setBedtime] = useState(DEFAULT_SCHEDULE.bedtime);
   const [targetNaps, setTargetNaps] = useState(DEFAULT_SCHEDULE.targetNaps);
-  const [napDurationMinutes, setNapDurationMinutes] = useState(
-    DEFAULT_SCHEDULE.napDurationMinutes,
-  );
+  const [napDurationMinutes, setNapDurationMinutes] = useState(DEFAULT_SCHEDULE.napDurationMinutes);
 
   const todaySleepMins = sleepMinutesToday(entries);
   const isDaySession = activeSession?.kind === 'day';
@@ -155,9 +150,7 @@ export default function SleepScreen() {
     return () => clearInterval(id);
   }, [activeSession]);
 
-  const timerLabel = activeSession
-    ? formatElapsedTimer(activeSession.startedAt)
-    : '00:00:00';
+  const timerLabel = activeSession ? formatElapsedTimer(activeSession.startedAt) : '00:00:00';
 
   void tick;
 
@@ -188,9 +181,7 @@ export default function SleepScreen() {
       const endedAt = new Date().toISOString();
       const mins = Math.max(
         1,
-        Math.round(
-          (new Date(endedAt).getTime() - new Date(startedAt).getTime()) / 60_000,
-        ),
+        Math.round((new Date(endedAt).getTime() - new Date(startedAt).getTime()) / 60_000),
       );
 
       await addEntry({
@@ -259,10 +250,7 @@ export default function SleepScreen() {
               : 'bg-indigo-500 dark:bg-indigo-700',
           )}
         >
-          <Pressable
-            onPress={() => router.back()}
-            className="mb-4 flex-row items-center gap-2"
-          >
+          <Pressable onPress={() => router.back()} className="mb-4 flex-row items-center gap-2">
             <ChevronLeft size={24} color="#fff" />
             <Text className="text-white/90">Back</Text>
           </Pressable>
@@ -279,21 +267,13 @@ export default function SleepScreen() {
                   isDaySession ? 'bg-white/25' : 'bg-indigo-900/40',
                 )}
               >
-                {isDaySession ? (
-                  <Sun size={16} color="#fff" />
-                ) : (
-                  <Moon size={16} color="#E0E7FF" />
-                )}
+                {isDaySession ? <Sun size={16} color="#fff" /> : <Moon size={16} color="#E0E7FF" />}
                 <Text className="text-sm font-bold text-white">
                   {isDaySession ? 'Day nap in progress' : 'Night sleep in progress'}
                 </Text>
               </View>
               <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-white/20">
-                {isDaySession ? (
-                  <Sun size={44} color="#fff" />
-                ) : (
-                  <Moon size={44} color="#E0E7FF" />
-                )}
+                {isDaySession ? <Sun size={44} color="#fff" /> : <Moon size={44} color="#E0E7FF" />}
               </View>
               <Text className="font-mono text-5xl font-bold tracking-wider text-white">
                 {timerLabel}
@@ -365,7 +345,7 @@ export default function SleepScreen() {
           <Text variant="subtitle" className="font-bold">
             Sleep schedule
           </Text>
-          <Text variant="caption" muted className="mt-1 mb-5">
+          <Text variant="caption" muted className="mb-5 mt-1">
             Set preferences, then tap Generate to build today&apos;s nap times
           </Text>
 

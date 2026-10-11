@@ -92,10 +92,7 @@ export default function NotificationsScreen() {
 
   return (
     <Screen scroll contentClassName="pb-10">
-      <ScreenBackHeader
-        title="Notifications"
-        subtitle="Medicine reminders on your device"
-      />
+      <ScreenBackHeader title="Notifications" subtitle="Medicine reminders on your device" />
 
       <Card tone="lavender" className="mb-5 gap-4">
         <View className="flex-row items-center gap-3">
@@ -113,9 +110,9 @@ export default function NotificationsScreen() {
         </View>
         <Text className="leading-6">
           MamaNote uses notifications for one thing:{' '}
-          <Text className="font-semibold">medicine reminders</Text>. When you log a
-          medicine and choose reminder times, we schedule daily alerts on your phone
-          so you don&apos;t miss a dose.
+          <Text className="font-semibold">medicine reminders</Text>. When you log a medicine and
+          choose reminder times, we schedule daily alerts on your phone so you don&apos;t miss a
+          dose.
         </Text>
       </Card>
 
@@ -141,8 +138,8 @@ export default function NotificationsScreen() {
           </Text>
         ) : requiresDevBuildForNotifications() ? (
           <Text muted className="leading-6">
-            Android Expo Go cannot show notifications. Install a development or production
-            build to test medicine reminders.
+            Android Expo Go cannot show notifications. Install a development or production build to
+            test medicine reminders.
           </Text>
         ) : (
           <>
@@ -203,8 +200,8 @@ export default function NotificationsScreen() {
           </View>
         </View>
         <Text muted variant="caption" className="leading-5">
-          Set or change reminders when logging medicine, or edit them from a medicine
-          log entry. Reminder schedules are stored on your device.
+          Set or change reminders when logging medicine, or edit them from a medicine log entry.
+          Reminder schedules are stored on your device.
         </Text>
       </Card>
 

@@ -29,14 +29,7 @@ interface TextProps extends RNTextProps {
   muted?: boolean;
 }
 
-export function Text({
-  variant = 'body',
-  weight,
-  muted,
-  className,
-  style,
-  ...rest
-}: TextProps) {
+export function Text({ variant = 'body', weight, muted, className, style, ...rest }: TextProps) {
   const fontFamily = weight ? FontFamily[weight] : VARIANT_FONT[variant];
 
   return (

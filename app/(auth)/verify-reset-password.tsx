@@ -136,9 +136,7 @@ export default function VerifyResetPasswordScreen() {
               <Text
                 variant="caption"
                 className={
-                  cooldown > 0
-                    ? 'text-ink-400'
-                    : 'font-semibold text-pink-500 dark:text-pink-300'
+                  cooldown > 0 ? 'text-ink-400' : 'font-semibold text-pink-500 dark:text-pink-300'
                 }
               >
                 {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}

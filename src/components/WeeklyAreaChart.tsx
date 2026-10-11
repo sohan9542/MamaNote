@@ -1,13 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import Svg, {
-  Circle,
-  Defs,
-  LinearGradient,
-  Path,
-  Stop,
-  Text as SvgText,
-} from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
 
 import { Text } from './Text';
 import { useTheme } from '@hooks/useTheme';
@@ -73,10 +66,7 @@ export function WeeklyAreaChart({ data, period, onPeriodChange, onDayPress }: Pr
   const chartInnerW = Math.max(svgWidth - PAD_LEFT - PAD_RIGHT, 1);
   const totalHeight = CHART_HEIGHT + PAD_TOP + PAD_BOTTOM;
 
-  const maxSleep = useMemo(
-    () => Math.max(...data.map((d) => d.sleepHours), 1),
-    [data],
-  );
+  const maxSleep = useMemo(() => Math.max(...data.map((d) => d.sleepHours), 1), [data]);
 
   const yMax = useMemo(() => {
     const rounded = Math.ceil(maxSleep);
@@ -88,10 +78,8 @@ export function WeeklyAreaChart({ data, period, onPeriodChange, onDayPress }: Pr
     if (n === 0) return { points: [], coords: [], yTicks: [] as number[] };
 
     const coords = data.map((point, i) => {
-      const x =
-        n === 1 ? PAD_LEFT + chartInnerW / 2 : PAD_LEFT + (i / (n - 1)) * chartInnerW;
-      const y =
-        PAD_TOP + CHART_HEIGHT - (point.sleepHours / yMax) * CHART_HEIGHT;
+      const x = n === 1 ? PAD_LEFT + chartInnerW / 2 : PAD_LEFT + (i / (n - 1)) * chartInnerW;
+      const y = PAD_TOP + CHART_HEIGHT - (point.sleepHours / yMax) * CHART_HEIGHT;
       return { point, x, y };
     });
 
@@ -115,10 +103,7 @@ export function WeeklyAreaChart({ data, period, onPeriodChange, onDayPress }: Pr
 
   const gridColor = isDark ? '#374151' : '#E5E7EB';
   const labelColor = isDark ? '#9CA3AF' : '#6B7280';
-  const avgSleep =
-    data.length > 0
-      ? data.reduce((s, d) => s + d.sleepHours, 0) / data.length
-      : 0;
+  const avgSleep = data.length > 0 ? data.reduce((s, d) => s + d.sleepHours, 0) / data.length : 0;
 
   return (
     <View
@@ -201,9 +186,7 @@ export function WeeklyAreaChart({ data, period, onPeriodChange, onDayPress }: Pr
           ))}
 
           {areaPath ? <Path d={areaPath} fill="url(#sleepArea)" /> : null}
-          {linePath ? (
-            <Path d={linePath} stroke="#7C3AED" strokeWidth={2.5} fill="none" />
-          ) : null}
+          {linePath ? <Path d={linePath} stroke="#7C3AED" strokeWidth={2.5} fill="none" /> : null}
 
           {plot.coords.map(({ point, x, y }) => (
             <Circle

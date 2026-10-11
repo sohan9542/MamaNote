@@ -34,11 +34,7 @@ export function PasswordInput({
           accessibilityRole="button"
           accessibilityLabel={visible ? 'Hide password' : 'Show password'}
         >
-          {visible ? (
-            <EyeOff size={18} color="#A89FBE" />
-          ) : (
-            <Eye size={18} color="#A89FBE" />
-          )}
+          {visible ? <EyeOff size={18} color="#A89FBE" /> : <Eye size={18} color="#A89FBE" />}
         </Pressable>
       }
       {...rest}

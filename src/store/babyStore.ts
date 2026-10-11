@@ -6,12 +6,7 @@ import { assertCanAddBaby, assertCanAddLog } from '@lib/freemium';
 import { trackLogSavedForRating } from '@lib/ratingPrompt';
 import { useRatingPromptStore } from '@store/ratingPromptStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
-import type {
-  Baby,
-  Database,
-  LogEntry,
-  LogEntryType,
-} from '@app-types/database';
+import type { Baby, Database, LogEntry, LogEntryType } from '@app-types/database';
 
 type LogEntryInsert = Database['public']['Tables']['log_entries']['Insert'];
 
@@ -134,17 +129,13 @@ export const useBabyStore = create<BabyState>((set, get) => ({
 
     const babies = (data ?? []) as Baby[];
     const storedActiveId = await readActiveBabyId();
-    const activeBabyId = resolveActiveBabyId(
-      babies,
-      storedActiveId ?? get().activeBabyId,
-    );
+    const activeBabyId = resolveActiveBabyId(babies, storedActiveId ?? get().activeBabyId);
 
     if (activeBabyId !== storedActiveId) {
       await writeActiveBabyId(activeBabyId);
     }
 
-    const entriesStillValid =
-      activeBabyId != null && get().entriesReadyBabyId === activeBabyId;
+    const entriesStillValid = activeBabyId != null && get().entriesReadyBabyId === activeBabyId;
 
     set({
       babies,
@@ -156,8 +147,7 @@ export const useBabyStore = create<BabyState>((set, get) => ({
   },
 
   fetchEntries: async (babyId) => {
-    const staleBaby =
-      get().entries.length > 0 && get().entries[0]?.baby_id !== babyId;
+    const staleBaby = get().entries.length > 0 && get().entries[0]?.baby_id !== babyId;
     set({
       loading: true,
       error: null,
@@ -185,11 +175,7 @@ export const useBabyStore = create<BabyState>((set, get) => ({
     const access = useSubscriptionStore.getState().getFreemiumAccess();
     await assertCanAddLog(entry.baby_id, access);
 
-    const { data, error } = await supabase
-      .from('log_entries')
-      .insert([entry])
-      .select()
-      .single();
+    const { data, error } = await supabase.from('log_entries').insert([entry]).select().single();
     if (error) {
       set({ error: error.message });
       throw new Error(error.message);

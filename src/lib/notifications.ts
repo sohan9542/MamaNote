@@ -88,11 +88,7 @@ export async function ensureNotificationPermissions(): Promise<boolean> {
   return status === 'granted';
 }
 
-export type NotificationPermissionStatus =
-  | 'granted'
-  | 'denied'
-  | 'undetermined'
-  | 'unsupported';
+export type NotificationPermissionStatus = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 
 export async function getNotificationPermissionStatus(): Promise<NotificationPermissionStatus> {
   if (!notificationsSupported || requiresDevBuildForNotifications()) {
@@ -108,11 +104,7 @@ export async function getNotificationPermissionStatus(): Promise<NotificationPer
   return 'undetermined';
 }
 
-export function medicineNotificationId(
-  babyId: string,
-  reminderId: string,
-  hhmm: string,
-): string {
+export function medicineNotificationId(babyId: string, reminderId: string, hhmm: string): string {
   return `medicine-${babyId}-${reminderId}-${hhmm.replace(':', '')}`;
 }
 

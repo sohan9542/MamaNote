@@ -21,11 +21,7 @@ import { useAuthStore } from '@store/authStore';
 import { useBabyStore } from '@store/babyStore';
 import { useScheduleStore } from '@store/scheduleStore';
 import { useSubscriptionStore } from '@store/subscriptionStore';
-import {
-  countTodayForActivity,
-  getLastEntryForActivity,
-  getLastFeedEntry,
-} from '@utils/baby';
+import { countTodayForActivity, getLastEntryForActivity, getLastFeedEntry } from '@utils/baby';
 import { formatHeaderDate } from '@utils/date';
 import type { LogEntry } from '@app-types/database';
 import { PLUS_MESSAGES, requirePlus } from '@utils/plusUpgrade';
@@ -58,8 +54,7 @@ export default function HomeScreen() {
     void load();
   }, [load]);
 
-  const entriesReady =
-    !activeBabyId || entriesReadyBabyId === activeBabyId;
+  const entriesReady = !activeBabyId || entriesReadyBabyId === activeBabyId;
   const showContentSkeleton = !babiesInitialized || !entriesReady;
 
   useEffect(() => {
@@ -93,7 +88,7 @@ export default function HomeScreen() {
         <Text variant="caption" muted>
           {formatHeaderDate()}
         </Text>
-          <View className="mt-1 flex-row items-end justify-between">
+        <View className="mt-1 flex-row items-end justify-between">
           <Text variant="display" className="font-display">
             {firstName}
           </Text>
@@ -183,13 +178,15 @@ export default function HomeScreen() {
                 </Text>
               </View>
             ) : (
-              entries.slice(0, 10).map((entry) => (
-                <LogEntryRow
-                  key={entry.id}
-                  entry={entry}
-                  onPress={() => setSelectedEntry(entry)}
-                />
-              ))
+              entries
+                .slice(0, 10)
+                .map((entry) => (
+                  <LogEntryRow
+                    key={entry.id}
+                    entry={entry}
+                    onPress={() => setSelectedEntry(entry)}
+                  />
+                ))
             )}
           </View>
         </>

@@ -14,9 +14,7 @@ const BRAND_PEACH = '#F9B88A';
 const BRAND_PEACH_RGB = { r: 249, g: 184, b: 138 };
 
 async function sampleBrandColor() {
-  const { data, info } = await sharp(SOURCE)
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(SOURCE).raw().toBuffer({ resolveWithObject: true });
 
   let r = 0;
   let g = 0;
@@ -104,10 +102,7 @@ async function main() {
 
   const peachRgb = await sampleBrandColor();
   const peachHex =
-    '#' +
-    [peachRgb.r, peachRgb.g, peachRgb.b]
-      .map((v) => v.toString(16).padStart(2, '0'))
-      .join('');
+    '#' + [peachRgb.r, peachRgb.g, peachRgb.b].map((v) => v.toString(16).padStart(2, '0')).join('');
 
   console.log('Brand peach:', peachHex);
   const cleanLogo = await loadCleanLogo(peachRgb);
@@ -118,7 +113,9 @@ async function main() {
   await writeLogoClean(cleanLogo, peachRgb);
   await writeFavicon(cleanLogo, peachRgb);
 
-  console.log('Generated: icon.png, adaptive-icon.png, splash-icon.png, logo-clean.png, favicon.png');
+  console.log(
+    'Generated: icon.png, adaptive-icon.png, splash-icon.png, logo-clean.png, favicon.png',
+  );
   console.log('Set adaptiveIcon.backgroundColor to', peachHex, 'in app.json');
 }
 

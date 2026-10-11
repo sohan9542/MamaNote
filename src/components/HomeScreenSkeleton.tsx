@@ -31,10 +31,7 @@ export function HomeScreenSkeleton() {
         contentContainerClassName="gap-0 pr-4"
       >
         {HOME_ACTIVITIES.map((activity) => (
-          <Skeleton
-            key={activity.id}
-            className="mr-3 h-[132px] w-[112px] rounded-3xl"
-          />
+          <Skeleton key={activity.id} className="mr-3 h-[132px] w-[112px] rounded-3xl" />
         ))}
       </ScrollView>
 

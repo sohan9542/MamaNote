@@ -92,9 +92,7 @@ export function resolveSleepMinutes(state: SleepLogState): number | null {
 export function resolveSleepEntryTimes(
   state: SleepLogState,
   options?: { referenceDay?: Date; endAt?: Date },
-):
-  | { started_at: string; ended_at: string; durationMinutes: number }
-  | { error: string } {
+): { started_at: string; ended_at: string; durationMinutes: number } | { error: string } {
   const referenceDay = options?.referenceDay ?? new Date();
 
   if (state.mode === 'duration') {

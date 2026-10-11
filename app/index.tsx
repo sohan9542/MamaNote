@@ -20,11 +20,7 @@ export default function Index() {
   }
 
   if (session && user && !isEmailConfirmed(user)) {
-    return (
-      <Redirect
-        href={`/(auth)/verify-email?email=${encodeURIComponent(user.email ?? '')}`}
-      />
-    );
+    return <Redirect href={`/(auth)/verify-email?email=${encodeURIComponent(user.email ?? '')}`} />;
   }
 
   if (pendingVerificationEmail) {

@@ -22,7 +22,10 @@ export function OptionChip({ label, selected, onPress, className }: OptionChipPr
         className,
       )}
     >
-      <Text variant="caption" className={cn('font-semibold', selected && 'text-lavender-700 dark:text-lavender-200')}>
+      <Text
+        variant="caption"
+        className={cn('font-semibold', selected && 'text-lavender-700 dark:text-lavender-200')}
+      >
         {label}
       </Text>
     </Pressable>

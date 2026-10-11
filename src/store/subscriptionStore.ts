@@ -89,7 +89,9 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   fetch: async () => {
     set({ loading: true, error: null });
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         set({ entitlement: null, loading: false, hydrated: true });
         return;

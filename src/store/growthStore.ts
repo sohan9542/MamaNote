@@ -35,9 +35,7 @@ export const useGrowthStore = create<GrowthState>((set, get) => ({
   toggleSkill: async (babyId, milestoneId, skillIndex) => {
     const token = skillToken(milestoneId, skillIndex);
     const current = get().completed[babyId] ?? [];
-    const next = current.includes(token)
-      ? current.filter((t) => t !== token)
-      : [...current, token];
+    const next = current.includes(token) ? current.filter((t) => t !== token) : [...current, token];
     set((s) => ({ completed: { ...s.completed, [babyId]: next } }));
     await AsyncStorage.setItem(key(babyId), JSON.stringify(next));
   },

@@ -188,10 +188,7 @@ export function getActivityById(id: string): ActivityOption | undefined {
   return HOME_ACTIVITIES.find((a) => a.id === id);
 }
 
-export function resolveActivityFromParams(
-  type?: string,
-  note?: string,
-): ActivityOption {
+export function resolveActivityFromParams(type?: string, note?: string): ActivityOption {
   if (note) {
     const byLabel = HOME_ACTIVITIES.find((a) => a.label === note);
     if (byLabel) return byLabel;
@@ -212,7 +209,5 @@ export function getActivityForEntry(
   if (type === 'note') {
     return HOME_ACTIVITIES.find((a) => a.id === 'notes');
   }
-  return HOME_ACTIVITIES.find(
-    (a) => a.type === type && !a.defaultMetadata?.subtype,
-  );
+  return HOME_ACTIVITIES.find((a) => a.type === type && !a.defaultMetadata?.subtype);
 }

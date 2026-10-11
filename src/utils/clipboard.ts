@@ -24,6 +24,9 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export async function copyToClipboardWithFeedback(text: string): Promise<void> {
   const copied = await copyToClipboard(text);
   if (!copied && Platform.OS !== 'web') {
-    Alert.alert('Copy link', 'Use “Copy” from the share sheet, or rebuild the app to enable one-tap copy.');
+    Alert.alert(
+      'Copy link',
+      'Use “Copy” from the share sheet, or rebuild the app to enable one-tap copy.',
+    );
   }
 }

@@ -19,11 +19,7 @@ export async function ensureNotificationPermissions(): Promise<boolean> {
   return false;
 }
 
-export function medicineNotificationId(
-  babyId: string,
-  reminderId: string,
-  hhmm: string,
-): string {
+export function medicineNotificationId(babyId: string, reminderId: string, hhmm: string): string {
   return `medicine-${babyId}-${reminderId}-${hhmm.replace(':', '')}`;
 }
 

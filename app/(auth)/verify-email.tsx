@@ -101,7 +101,7 @@ export default function VerifyEmailScreen() {
           <View className="mb-2 h-16 w-16 items-center justify-center rounded-full bg-pink-100 dark:bg-ink-600">
             <Mail size={32} color="#FB7185" />
           </View>
-          <Text variant="display" className="font-display text-center">
+          <Text variant="display" className="text-center font-display">
             Check your email
           </Text>
           <Text muted className="text-center leading-6">
@@ -133,9 +133,7 @@ export default function VerifyEmailScreen() {
               <Text
                 variant="caption"
                 className={
-                  cooldown > 0
-                    ? 'text-ink-400'
-                    : 'font-semibold text-pink-500 dark:text-pink-300'
+                  cooldown > 0 ? 'text-ink-400' : 'font-semibold text-pink-500 dark:text-pink-300'
                 }
               >
                 {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}

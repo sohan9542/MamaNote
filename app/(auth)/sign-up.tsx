@@ -23,9 +23,7 @@ export default function SignUpScreen() {
 
   const goToVerify = (normalized: string) => {
     setPendingVerificationEmail(normalized);
-    router.replace(
-      `/(auth)/verify-email?email=${encodeURIComponent(normalized)}` as const,
-    );
+    router.replace(`/(auth)/verify-email?email=${encodeURIComponent(normalized)}` as const);
   };
 
   const handleSubmit = async () => {
@@ -44,18 +42,11 @@ export default function SignUpScreen() {
       // Set before signUp sign-out so the root guard knows we're in the OTP flow
       setPendingVerificationEmail(normalized);
 
-      const { user, needsEmailVerification } = await signUpWithEmail(
-        normalized,
-        password,
-        name,
-      );
+      const { user, needsEmailVerification } = await signUpWithEmail(normalized, password, name);
 
       if (!needsEmailVerification && isEmailConfirmed(user)) {
         setPendingVerificationEmail(null);
-        Alert.alert(
-          'Account ready',
-          'Your email is already confirmed. You can sign in now.',
-        );
+        Alert.alert('Account ready', 'Your email is already confirmed. You can sign in now.');
         router.replace('/(auth)/sign-in');
         return;
       }

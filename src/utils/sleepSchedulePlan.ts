@@ -57,7 +57,8 @@ export function generateSleepPlan(
 
   if (awakeMinutes < naps * 30) {
     return {
-      error: 'Not enough time between wake and bed for this many naps. Try fewer naps or a shorter nap length.',
+      error:
+        'Not enough time between wake and bed for this many naps. Try fewer naps or a shorter nap length.',
     };
   }
 

@@ -119,15 +119,10 @@ export const useSleepStore = create<SleepState>((set, get) => ({
 }));
 
 export async function loadScheduleForBaby(babyId: string) {
-  const [schedule, plan] = await Promise.all([
-    readSchedule(babyId),
-    readPlan(babyId),
-  ]);
+  const [schedule, plan] = await Promise.all([readSchedule(babyId), readPlan(babyId)]);
   useSleepStore.setState((s) => ({
     schedules: { ...s.schedules, [babyId]: schedule },
-    generatedPlans: plan
-      ? { ...s.generatedPlans, [babyId]: plan }
-      : s.generatedPlans,
+    generatedPlans: plan ? { ...s.generatedPlans, [babyId]: plan } : s.generatedPlans,
   }));
 }
 
@@ -145,5 +140,5 @@ export function useBabySchedule(babyId: string | null) {
 }
 
 export function useBabySleepPlan(babyId: string | null) {
-  return useSleepStore((s) => (babyId ? s.generatedPlans[babyId] ?? null : null));
+  return useSleepStore((s) => (babyId ? (s.generatedPlans[babyId] ?? null) : null));
 }

@@ -13,7 +13,10 @@ export function RoutineSourceBadge({ meta }: Props) {
   if (!isClaude) {
     return (
       <View className="self-start rounded-full bg-amber-100 px-2.5 py-0.5 dark:bg-amber-900/30">
-        <Text variant="caption" className="text-[10px] font-bold text-amber-700 dark:text-amber-200">
+        <Text
+          variant="caption"
+          className="text-[10px] font-bold text-amber-700 dark:text-amber-200"
+        >
           Demo
         </Text>
       </View>
@@ -22,7 +25,10 @@ export function RoutineSourceBadge({ meta }: Props) {
 
   return (
     <View className="self-start rounded-full bg-white/80 px-2.5 py-0.5 dark:bg-ink-700/80">
-      <Text variant="caption" className="text-[10px] font-bold text-lavender-700 dark:text-lavender-200">
+      <Text
+        variant="caption"
+        className="text-lavender-700 text-[10px] font-bold dark:text-lavender-200"
+      >
         Sonnet ✦
       </Text>
     </View>

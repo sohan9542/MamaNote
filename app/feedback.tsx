@@ -74,10 +74,7 @@ export default function FeedbackScreen() {
 
   return (
     <Screen scroll contentClassName="pb-10">
-      <ScreenBackHeader
-        title="Send feedback"
-        subtitle="Rate us or tell us how we're doing"
-      />
+      <ScreenBackHeader title="Send feedback" subtitle="Rate us or tell us how we're doing" />
 
       <Card tone="pink" className="mb-5 gap-4">
         <View className="flex-row items-center gap-3">

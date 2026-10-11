@@ -63,7 +63,7 @@ export function FeatureHubCards() {
           </View>
           <View className="mt-4">
             <Text className="text-base font-bold leading-5 text-white">Sleep</Text>
-            <Text className="text-sm font-medium leading-4 text-white">Timer & schedule</Text>
+            <Text className="font-medium text-sm leading-4 text-white">Timer & schedule</Text>
           </View>
         </View>
       </Pressable>

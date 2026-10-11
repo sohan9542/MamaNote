@@ -1,184 +1,173 @@
-# 🌸 Mamanote
+# MamaNote
 
-A soft, calming baby tracking app — built with Expo, React Native, NativeWind, Supabase, and Zustand.
+Gentle baby tracking for new parents — log feeds, sleep, diapers, medicine, and milestones, then spot patterns without the noise.
 
-> **Tagline:** Gentle tracking for your little one.
+**Live product:** [mamanoteapp.com](https://www.mamanoteapp.com)
 
----
-
-## ✨ Features (initial setup)
-
-- 🍼 Bottom tab navigation: **Home · Log · Stats · Profile**
-- 🌗 Light / Dark mode with system follow + manual toggle
-- 🌷 Pastel design system (soft pink, mint, lavender, warm beige)
-- 🔐 Email/password auth via **Supabase**
-- 📥 Quick-log entries (feeding, sleep, diaper, pump, medicine, notes)
-- 📊 Daily insights stub with stat cards
-- 🔔 Push notifications scaffolding (Expo Notifications)
-- ⚡ State management with **Zustand**
-- 🎞 Smooth interactions with **Reanimated** & **Gesture Handler**
-- 🧭 File-based routing with **Expo Router**
-- 🎨 Styling with **NativeWind v4 (Tailwind CSS)**
+This repository is the **MamaNote** mobile app (Expo / React Native) with a Supabase backend and Edge Functions. The marketing site at the link above describes the product; this repo is the application source.
 
 ---
 
-## 🧱 Tech stack
+## Features
 
-| Concern        | Library                              |
-| -------------- | ------------------------------------ |
-| Framework      | Expo SDK 54 + React Native 0.81      |
-| Language       | TypeScript 5.9 + React 19.1          |
-| Routing        | `expo-router` (file-based)           |
-| Styling        | `nativewind` v4 (Tailwind 3.4)       |
-| State          | `zustand`                            |
-| Backend        | `@supabase/supabase-js`              |
-| Animation      | `react-native-reanimated` v3         |
-| Gestures       | `react-native-gesture-handler`       |
-| Notifications  | `expo-notifications`                 |
-| Icons          | `lucide-react-native`                |
-| Storage        | `@react-native-async-storage/async-storage` |
+Implemented in this codebase (aligned with the live product):
+
+- Email/password auth with email OTP verification (Supabase Auth)
+- Baby profiles and activity logging (feeding, sleep, diaper, pump, medicine, notes, and related subtypes)
+- Home quick actions, log sheet, and stats / insights views
+- Light / dark theme (system follow + manual toggle)
+- Freemium model: complimentary Plus trial, then daily log limits; MamaNote Plus via Paddle checkout
+- Activity sharing via tokenized links / QR (view-only Edge Function)
+- AI-assisted daily routine generation (Supabase Edge Function + Anthropic; mock fallback without API key)
+- Sleep hub, growth & milestones, local medicine reminders (device notifications)
+- Push notification scaffolding (Expo Notifications)
 
 ---
 
-## 📂 Folder structure
+## Tech stack
+
+| Area                 | Choice                                                   |
+| -------------------- | -------------------------------------------------------- |
+| App framework        | Expo SDK 54, React Native 0.81, React 19                 |
+| Language             | TypeScript (strict)                                      |
+| Routing              | Expo Router (file-based)                                 |
+| Styling              | NativeWind v4 (Tailwind CSS 3.4)                         |
+| State                | Zustand                                                  |
+| Backend              | Supabase (Postgres, Auth, RLS, Realtime, Edge Functions) |
+| Payments             | Paddle (checkout + webhooks via Edge Functions)          |
+| Animation / gestures | Reanimated 4, Gesture Handler                            |
+| Icons                | lucide-react-native                                      |
+
+---
+
+## Architecture
 
 ```
-mamanote/
-├─ app/                      # Expo Router (file-based routes)
-│  ├─ _layout.tsx            # Root layout + auth gate + theme
-│  ├─ index.tsx              # Auth redirect
-│  ├─ +not-found.tsx
-│  ├─ (auth)/
-│  │  ├─ _layout.tsx
-│  │  ├─ sign-in.tsx
-│  │  └─ sign-up.tsx
-│  └─ (tabs)/
-│     ├─ _layout.tsx         # Bottom tab navigator
-│     ├─ index.tsx           # Home
-│     ├─ log.tsx             # Add log entry
-│     ├─ stats.tsx           # Daily insights
-│     └─ profile.tsx         # Profile + settings
-├─ src/
-│  ├─ components/            # Reusable UI (Button, Card, Input, etc.)
-│  ├─ screens/               # (Reserved for larger composite screens)
-│  ├─ lib/                   # supabase client, auth helpers, notifications
-│  ├─ store/                 # Zustand stores (auth, theme, baby)
-│  ├─ hooks/                 # useTheme, useColorScheme
-│  ├─ utils/                 # date, cn (classnames)
-│  ├─ types/                 # database types
-│  └─ constants/             # colors, spacing, radius
-├─ assets/                   # icon, splash, notification icon
-├─ supabase/
-│  └─ schema.sql             # Run in Supabase SQL editor
-├─ app.json
-├─ babel.config.js
-├─ metro.config.js
-├─ tailwind.config.js
-├─ global.css
-├─ tsconfig.json
-├─ .env.example
-└─ package.json
+app/                     Expo Router screens & layouts (auth, tabs, share, paywall return)
+src/
+  components/            UI building blocks and feature sheets
+  constants/             Design tokens, activity catalog, freemium/subscription config
+  hooks/                 Fonts, theme, Plus activation polling
+  lib/                   Supabase client, auth, subscriptions, sharing, notifications
+  store/                 Zustand stores (auth, baby, theme, subscription, …)
+  types/                 Database & domain types
+  utils/                 Pure helpers (dates, sleep log, stats filters, …)
+supabase/
+  schema.sql             Base schema reference
+  RUN_IN_SQL_EDITOR.sql  Idempotent SQL to apply in the Supabase dashboard
+  migrations/            Incremental SQL migrations
+  functions/             Deno Edge Functions (checkout, webhooks, share, AI schedule)
 ```
 
----
-
-## 📦 SDK 54 notes
-
-This project targets **Expo SDK 54** (React Native 0.81, React 19.1).
-
-- **Node.js:** use **20.19+** (required by SDK 54).
-- **Reanimated v4** + **react-native-worklets** — required by NativeWind 4.2+ on SDK 54. Babel uses `nativewind/babel` (worklets plugin); `babel-preset-expo` auto-plugins are disabled to avoid duplicates.
-- **Expo Router:** upgraded to **v6** with SDK 54.
-- **Upgrade command** (if you fork this later):
-
-  ```bash
-  npx expo install expo@^54.0.0 --fix
-  ```
+Client code talks to Supabase with the **anon** key (`EXPO_PUBLIC_*`). Premium gates and share creation are enforced in app logic and RLS / Edge Functions. Paddle and Anthropic secrets stay server-side (`supabase secrets`).
 
 ---
 
-## 🚀 Getting started
+## Requirements
 
-### 1. Install dependencies
+- **Node.js 20.19+** (Expo SDK 54)
+- npm
+- A Supabase project
+- Optional: Supabase CLI (Edge Functions), EAS CLI (native builds), Paddle + Anthropic keys for full Plus / AI flows
+
+---
+
+## Local setup
 
 ```bash
+git clone <repo-url>
+cd <repo>
 npm install
-```
-
-### 2. Configure Supabase
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor** and run the full file [`supabase/RUN_IN_SQL_EDITOR.sql`](./supabase/RUN_IN_SQL_EDITOR.sql) (fixes *"table not in schema cache"*). Wait for **Success**, then retry the app.
-3. Enable **6-digit email OTP** for sign-up — see [supabase/AUTH_SETUP.md](./supabase/AUTH_SETUP.md).
-3. Copy `Project URL` and `anon public key` from **Project Settings → API**.
-4. Create a `.env` file in the project root:
-
-```bash
 cp .env.example .env
 ```
 
-```env
-EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_KEY
-```
+Fill in `.env` (see [Environment variables](#environment-variables)). Then:
 
-> `EXPO_PUBLIC_*` env vars are inlined at build time — restart `expo start` after changing them.
-
-### 3. Add app artwork
-
-Drop your final PNG files into `assets/` (see `assets/README.md`):
-
-- `icon.png` — 1024×1024
-- `adaptive-icon.png` — 1024×1024 (Android, transparent BG)
-- `splash.png` — 1284×2778
-- `favicon.png` — 48×48
-- `notification-icon.png` — 96×96 (white-on-transparent)
-
-### 4. Run the app
+1. In the Supabase SQL editor, run [`supabase/RUN_IN_SQL_EDITOR.sql`](./supabase/RUN_IN_SQL_EDITOR.sql).
+2. Enable 6-digit email OTP — see [`supabase/AUTH_SETUP.md`](./supabase/AUTH_SETUP.md).
+3. Start the app:
 
 ```bash
-npm run start       # then press i / a / w
-# or directly
-npm run ios
-npm run android
-npm run web
+npm start          # Expo dev server — press i / a / w
+npm run ios        # iOS (simulator / device)
+npm run android    # Android
+npm run web        # Web
 ```
 
-### 6. AI daily routine (Claude)
+Artwork expectations live in [`assets/README.md`](./assets/README.md).
 
-The **Stats** tab builds a weekly activity chart and can generate a personalized daily routine via Claude.
+### Edge Functions (optional)
 
-1. Re-run [`supabase/RUN_IN_SQL_EDITOR.sql`](./supabase/RUN_IN_SQL_EDITOR.sql) if you set up the DB before this feature (adds `baby_routines` table).
-2. Install the [Supabase CLI](https://supabase.com/docs/guides/cli) and link your project.
-3. Deploy the edge function:
+```bash
+supabase functions deploy generate-schedule
+supabase functions deploy create-checkout
+supabase functions deploy create-customer-portal
+supabase functions deploy paddle-webhook
+supabase functions deploy get-shared-activities
+```
 
-   ```bash
-   supabase functions deploy generate-schedule
-   ```
+Set server secrets as needed (never in the Expo app):
 
-4. Set your Anthropic API key as a **server secret** (never in the Expo app):
+```bash
+supabase secrets set ANTHROPIC_API_KEY=...
+supabase secrets set PADDLE_API_KEY=...
+supabase secrets set PADDLE_WEBHOOK_SECRET=...
+supabase secrets set PADDLE_ENV=sandbox
+```
 
-   ```bash
-   supabase secrets set ANTHROPIC_API_KEY=sk-ant-your-key
-   ```
-
-Without `ANTHROPIC_API_KEY`, the function returns a **mock routine** so you can test the UI locally.
+Without `ANTHROPIC_API_KEY`, `generate-schedule` returns a mock routine so the UI remains testable.
 
 ---
 
-## 🌗 Theming
+## Environment variables
 
-Theme tokens live in [`src/constants/colors.ts`](./src/constants/colors.ts) and are mirrored in [`tailwind.config.js`](./tailwind.config.js). Use Tailwind classes with the `dark:` variant — NativeWind is configured with `darkMode: 'class'` and the theme store toggles the document `colorScheme`.
+Copy [`.env.example`](./.env.example). Names only — values come from your Supabase / Paddle dashboards:
+
+| Variable                            | Where                           | Purpose                    |
+| ----------------------------------- | ------------------------------- | -------------------------- |
+| `EXPO_PUBLIC_SUPABASE_URL`          | App                             | Supabase project URL       |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY`     | App                             | Supabase anon (public) key |
+| `EXPO_PUBLIC_PADDLE_PRICE_MONTHLY`  | App                             | Paddle price id (monthly)  |
+| `EXPO_PUBLIC_PADDLE_PRICE_ANNUAL`   | App                             | Paddle price id (annual)   |
+| `EXPO_PUBLIC_PADDLE_PRICE_LIFETIME` | App                             | Paddle price id (lifetime) |
+| `EXPO_PUBLIC_SHARE_BASE_URL`        | App (optional)                  | Public share link base     |
+| `EXPO_PUBLIC_FEEDBACK_EMAIL`        | App (optional)                  | Profile feedback mailto    |
+| `EXPO_PUBLIC_PLAY_STORE_URL`        | App (optional)                  | Store link                 |
+| `EXPO_PUBLIC_APP_STORE_URL`         | App (optional)                  | Store link                 |
+| `ANTHROPIC_API_KEY`                 | Edge Function secret            | AI routine generation      |
+| `PADDLE_API_KEY`                    | Edge Function secret            | Checkout / portal          |
+| `PADDLE_WEBHOOK_SECRET`             | Edge Function secret            | Webhook verification       |
+| `PADDLE_ENV`                        | Edge Function secret            | `sandbox` or live          |
+| `PADDLE_CHECKOUT_URL`               | Edge Function secret (optional) | Checkout domain override   |
+
+`EXPO_PUBLIC_*` values are inlined at build time — restart Expo after changing them.
+
+---
+
+## Scripts
+
+| Script                                        | Description              |
+| --------------------------------------------- | ------------------------ |
+| `npm start`                                   | Expo dev server          |
+| `npm run ios` / `android` / `web`             | Platform targets         |
+| `npm run lint`                                | ESLint via `expo lint`   |
+| `npm run lint:fix`                            | ESLint autofix           |
+| `npm run format` / `format:check`             | Prettier                 |
+| `npm run typecheck`                           | `tsc --noEmit`           |
+| `npm test`                                    | Vitest unit tests        |
+| `npm run test:watch`                          | Vitest watch mode        |
+| `npm run assets:placeholder` / `assets:brand` | Asset generation helpers |
+| `npm run build:dev:android` / `ios`           | EAS development builds   |
+
+CI runs install → lint → typecheck → format check → test on `main` (see [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)). Native EAS builds are not run in CI (they need Expo credentials).
+
+---
+
+## Theming
+
+Tokens live in [`src/constants/colors.ts`](./src/constants/colors.ts) and are mirrored in [`tailwind.config.js`](./tailwind.config.js). NativeWind uses `darkMode: 'class'`; the theme store toggles the scheme.
 
 ```tsx
-<View className="bg-pink-50 dark:bg-ink-800">
-  <Text className="text-ink-800 dark:text-ink-50">Hello mama</Text>
-</View>
-```
-
-To toggle in code:
-
-```ts
 import { useTheme } from '@hooks/useTheme';
 
 const { toggle, mode, isDark } = useTheme();
@@ -186,30 +175,27 @@ const { toggle, mode, isDark } = useTheme();
 
 ---
 
-## 🧪 Supabase schema overview
+## Supabase schema (overview)
 
-| Table           | Purpose                                                   |
-| --------------- | --------------------------------------------------------- |
-| `profiles`      | One row per auth user (auto-created via trigger)          |
-| `babies`        | Babies belonging to a user                                |
-| `log_entries`   | Feeding / sleep / diaper / pump / medication / note logs  |
-| `baby_routines` | AI-generated daily schedules (Claude via edge function)   |
+| Table                     | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `profiles`                | One row per auth user (trigger-created)   |
+| `babies`                  | Baby profiles for a user                  |
+| `log_entries`             | Activity logs                             |
+| `baby_routines`           | Generated daily schedules                 |
+| `subscriptions` / related | Plus entitlement & Paddle linkage         |
+| `activity_shares`         | Share tokens for view-only activity feeds |
 
-All tables ship with **Row Level Security** so users only see their own rows. Realtime is enabled on `babies` and `log_entries`.
-
----
-
-## 🛣 Roadmap ideas
-
-- Onboarding flow + add-baby wizard
-- Growth charts (weight, height, head circumference)
-- Sleep timer with background tracking
-- Multi-caregiver sharing
-- Cloud sync indicator + offline queue
-- Localization (i18n)
+Tables use **Row Level Security** so users only access their own data. Realtime is enabled where the app subscribes (e.g. babies / log entries).
 
 ---
 
-## 📄 License
+## Author
 
-MIT
+**Sohanur Rahman** ([sohan9542](https://github.com/sohan9542))
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

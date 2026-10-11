@@ -3,10 +3,7 @@ import { create } from 'zustand';
 
 import { syncMedicineReminders } from '@lib/notifications';
 import type { MedicineReminder } from '@app-types/medicineReminder';
-import {
-  findRemindersForMedicine,
-  medicineNamesMatch,
-} from '@utils/medicineReminder';
+import { findRemindersForMedicine, medicineNamesMatch } from '@utils/medicineReminder';
 
 const STORAGE_KEY = '@mamanote/medicine-reminders';
 

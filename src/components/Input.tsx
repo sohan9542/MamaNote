@@ -27,9 +27,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       <View
         className={cn(
           'flex-row items-center gap-2 rounded-2xl border bg-white px-4 dark:bg-ink-700',
-          error
-            ? 'border-pink-500'
-            : 'border-ink-100 dark:border-ink-600',
+          error ? 'border-pink-500' : 'border-ink-100 dark:border-ink-600',
         )}
       >
         {leftIcon}

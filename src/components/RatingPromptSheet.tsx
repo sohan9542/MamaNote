@@ -110,12 +110,7 @@ export function RatingPromptSheet({ visible, onClose }: Props) {
             </Button>
           ) : null}
 
-          <Button
-            variant="secondary"
-            onPress={handleFeedback}
-            fullWidth
-            className="mt-2"
-          >
+          <Button variant="secondary" onPress={handleFeedback} fullWidth className="mt-2">
             {RATING_PROMPT.feedbackCta}
           </Button>
 

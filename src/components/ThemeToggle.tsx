@@ -1,9 +1,5 @@
 import { Pressable, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Moon, Sun } from 'lucide-react-native';
 import { useEffect } from 'react';
 

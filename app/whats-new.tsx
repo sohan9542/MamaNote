@@ -13,10 +13,7 @@ export default function WhatsNewScreen() {
 
   return (
     <Screen scroll contentClassName="pb-10">
-      <ScreenBackHeader
-        title="What's new"
-        subtitle="Latest updates in MamaNote"
-      />
+      <ScreenBackHeader title="What's new" subtitle="Latest updates in MamaNote" />
 
       <View className="gap-5">
         {CHANGELOG.map((release) => (

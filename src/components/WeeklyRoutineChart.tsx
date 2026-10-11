@@ -18,12 +18,7 @@ interface Props {
   onDayPress?: (day: DayChartData) => void;
 }
 
-export function WeeklyRoutineChart({
-  data,
-  title = '7 days',
-  onBlockPress,
-  onDayPress,
-}: Props) {
+export function WeeklyRoutineChart({ data, title = '7 days', onBlockPress, onDayPress }: Props) {
   const [width, setWidth] = useState(0);
 
   const chartWidth = Math.max(width - PAD_LEFT - 8, 1);
@@ -33,8 +28,7 @@ export function WeeklyRoutineChart({
   const hourLabels = useMemo(
     () =>
       HOURS.map((h) => {
-        const label =
-          h === 0 ? '12a' : h === 12 ? '12p' : h < 12 ? `${h}a` : `${h - 12}p`;
+        const label = h === 0 ? '12a' : h === 12 ? '12p' : h < 12 ? `${h}a` : `${h - 12}p`;
         const y = PAD_TOP + (h / 24) * CHART_HEIGHT;
         return { label, y };
       }),
@@ -53,7 +47,10 @@ export function WeeklyRoutineChart({
           Weekly overview
         </Text>
         <View className="rounded-full bg-lavender-100 px-3 py-1 dark:bg-lavender-200/15">
-          <Text variant="caption" className="font-semibold text-lavender-700 dark:text-lavender-200">
+          <Text
+            variant="caption"
+            className="text-lavender-700 font-semibold dark:text-lavender-200"
+          >
             {title}
           </Text>
         </View>
@@ -90,9 +87,7 @@ export function WeeklyRoutineChart({
                   rx={3}
                   fill={block.color}
                   opacity={0.92}
-                  onPress={
-                    onBlockPress ? () => onBlockPress(block, day) : undefined
-                  }
+                  onPress={onBlockPress ? () => onBlockPress(block, day) : undefined}
                 />
               );
             });

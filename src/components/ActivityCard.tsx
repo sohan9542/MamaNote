@@ -73,7 +73,7 @@ export function ActivityCard({
         ) : null}
       </View>
 
-      <View className="w-full items-center -top-3 px-0.5">
+      <View className="-top-3 w-full items-center px-0.5">
         <Text
           variant="caption"
           weight="semiBold"

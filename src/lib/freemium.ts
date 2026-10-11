@@ -78,10 +78,7 @@ export function assertFullInsights(access: FreemiumAccess) {
   );
 }
 
-export function freemiumLimitMessage(
-  code: FreemiumLimitCode,
-  dailyLogLimit?: number,
-): string {
+export function freemiumLimitMessage(code: FreemiumLimitCode, dailyLogLimit?: number): string {
   switch (code) {
     case 'daily_logs':
       return dailyLogLimit != null

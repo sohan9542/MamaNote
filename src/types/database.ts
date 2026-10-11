@@ -7,13 +7,7 @@
  * This file is the hand-written baseline used until the project is linked.
  */
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
   public: {
@@ -229,20 +223,9 @@ export interface Database {
   };
 }
 
-export type LogEntryType =
-  | 'feeding'
-  | 'sleep'
-  | 'diaper'
-  | 'pump'
-  | 'medication'
-  | 'note';
+export type LogEntryType = 'feeding' | 'sleep' | 'diaper' | 'pump' | 'medication' | 'note';
 
-export type SubscriptionStatus =
-  | 'free'
-  | 'trialing'
-  | 'active'
-  | 'canceled'
-  | 'past_due';
+export type SubscriptionStatus = 'free' | 'trialing' | 'active' | 'canceled' | 'past_due';
 
 export type SubscriptionPlan = 'monthly' | 'annual' | 'lifetime';
 

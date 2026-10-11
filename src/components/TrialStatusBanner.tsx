@@ -28,7 +28,7 @@ export function TrialStatusBanner() {
           <Sparkles size={18} color="#7C3AED" />
         </View>
         <View className="flex-1">
-          <View className="flex-row items-center  gap-2">
+          <View className="flex-row items-center gap-2">
             <Text variant="caption" className="shrink font-semibold">
               Your {COMPLIMENTARY_PLUS_DAYS}-day Plus trial
             </Text>

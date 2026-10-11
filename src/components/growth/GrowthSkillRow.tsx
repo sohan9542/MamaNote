@@ -24,15 +24,14 @@ function GrowthSkillRowComponent({ label, done, accentColor, onPress }: Props) {
         done ? 'border-transparent' : 'border-ink-100/80 dark:border-ink-600',
       )}
       style={
-        done
-          ? { backgroundColor: `${accentColor}18`, borderColor: `${accentColor}44` }
-          : undefined
+        done ? { backgroundColor: `${accentColor}18`, borderColor: `${accentColor}44` } : undefined
       }
     >
       <View
         className={cn(
           'h-8 w-8 items-center justify-center rounded-full',
-          !done && 'border-2 border-dashed border-ink-200 bg-white dark:border-ink-500 dark:bg-ink-700',
+          !done &&
+            'border-2 border-dashed border-ink-200 bg-white dark:border-ink-500 dark:bg-ink-700',
         )}
         style={done ? { backgroundColor: accentColor } : undefined}
       >

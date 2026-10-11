@@ -16,13 +16,7 @@ interface Props {
   onUpdated?: () => void;
 }
 
-export function StatsEntriesSheet({
-  visible,
-  title,
-  entries,
-  onClose,
-  onUpdated,
-}: Props) {
+export function StatsEntriesSheet({ visible, title, entries, onClose, onUpdated }: Props) {
   const insets = useSafeAreaInsets();
 
   return (

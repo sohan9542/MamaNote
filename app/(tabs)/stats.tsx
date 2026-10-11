@@ -27,19 +27,14 @@ import {
   type TrendChartPoint,
   weekDateKeyEnd,
 } from '@utils/scheduleChart';
-import {
-  filterEntriesForStats,
-  statsFilterTitle,
-  type StatsFilter,
-} from '@utils/statsFilter';
+import { filterEntriesForStats, statsFilterTitle, type StatsFilter } from '@utils/statsFilter';
 
 export type StatsActivityPeriod = 'weekly' | 'monthly';
 
-const STATS_PERIODS: { id: StatsActivityPeriod; label: string; days: number; caption: string }[] =
-  [
-    { id: 'weekly', label: 'Weekly', days: 7, caption: 'this week' },
-    { id: 'monthly', label: 'Monthly', days: 30, caption: 'this month' },
-  ];
+const STATS_PERIODS: { id: StatsActivityPeriod; label: string; days: number; caption: string }[] = [
+  { id: 'weekly', label: 'Weekly', days: 7, caption: 'this week' },
+  { id: 'monthly', label: 'Monthly', days: 30, caption: 'this month' },
+];
 
 export default function StatsScreen() {
   const router = useRouter();
@@ -66,8 +61,7 @@ export default function StatsScreen() {
   const [statsPeriod, setStatsPeriod] = useState<StatsActivityPeriod>('weekly');
   const [sheetFilter, setSheetFilter] = useState<StatsFilter | null>(null);
 
-  const statsPeriodConfig =
-    STATS_PERIODS.find((p) => p.id === statsPeriod) ?? STATS_PERIODS[0];
+  const statsPeriodConfig = STATS_PERIODS.find((p) => p.id === statsPeriod) ?? STATS_PERIODS[0];
   const statsPeriodDays = statsPeriodConfig.days;
 
   const routinePeriodDays = 7;
@@ -228,8 +222,8 @@ export default function StatsScreen() {
         </Text>
         {!isPremium() && activeBabyId ? (
           <Text variant="caption" muted>
-            {todayLogCount}/
-            {Number.isFinite(getDailyLogLimit()) ? getDailyLogLimit() : '∞'} logs today
+            {todayLogCount}/{Number.isFinite(getDailyLogLimit()) ? getDailyLogLimit() : '∞'} logs
+            today
           </Text>
         ) : null}
       </View>

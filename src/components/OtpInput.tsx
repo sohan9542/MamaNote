@@ -46,7 +46,7 @@ export function OtpInput({ value, onChange, error, disabled }: OtpInputProps) {
                       : 'border-ink-100 dark:border-ink-600',
               )}
             >
-              <Text variant="title" className="text-2xl font-semibold">
+              <Text variant="title" className="font-semibold text-2xl">
                 {filled ? digit : ''}
               </Text>
             </View>

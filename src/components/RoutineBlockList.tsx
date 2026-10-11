@@ -54,11 +54,11 @@ export function RoutineBlockList({ routine, compact = false }: Props) {
       {tips.length > 0 ? (
         <View className="flex-row flex-wrap justify-center gap-2">
           {tips.map((tip, i) => (
-            <View
-              key={i}
-              className="rounded-full bg-mint-100 px-3 py-2 dark:bg-mint-100/10"
-            >
-              <Text variant="caption" className="text-[12px] font-medium text-ink-700 dark:text-ink-100">
+            <View key={i} className="rounded-full bg-mint-100 px-3 py-2 dark:bg-mint-100/10">
+              <Text
+                variant="caption"
+                className="font-medium text-[12px] text-ink-700 dark:text-ink-100"
+              >
                 💡 {shortTip(tip)}
               </Text>
             </View>
@@ -83,7 +83,7 @@ function TimelineRow({ block, isLast }: { block: RoutineBlock; isLast: boolean }
           <Text className="text-xl">{emoji}</Text>
         </View>
         {!isLast ? (
-          <View className="my-1 w-0.5 flex-1 min-h-[16px] rounded-full bg-ink-100 dark:bg-ink-600" />
+          <View className="my-1 min-h-[16px] w-0.5 flex-1 rounded-full bg-ink-100 dark:bg-ink-600" />
         ) : null}
       </View>
 
@@ -94,9 +94,7 @@ function TimelineRow({ block, isLast }: { block: RoutineBlock; isLast: boolean }
           </Text>
           <Text variant="caption" className="font-semibold text-ink-500">
             {formatTimeShort(block.startTime)}
-            {block.endTime !== block.startTime
-              ? ` – ${formatTimeShort(block.endTime)}`
-              : ''}
+            {block.endTime !== block.startTime ? ` – ${formatTimeShort(block.endTime)}` : ''}
           </Text>
         </View>
       </View>
@@ -115,13 +113,7 @@ function shortTip(text: string): string {
 }
 
 /** Big playful "what's next" cards */
-export function RoutineNextCards({
-  feed,
-  sleep,
-}: {
-  feed?: string;
-  sleep?: string;
-}) {
+export function RoutineNextCards({ feed, sleep }: { feed?: string; sleep?: string }) {
   if (!feed && !sleep) return null;
 
   return (
@@ -132,7 +124,10 @@ export function RoutineNextCards({
           <Text variant="caption" muted className="mt-2">
             Next feed
           </Text>
-          <Text variant="caption" className="mt-0.5 text-center font-bold text-orange-800 dark:text-orange-200">
+          <Text
+            variant="caption"
+            className="mt-0.5 text-center font-bold text-orange-800 dark:text-orange-200"
+          >
             {shortTip(feed)}
           </Text>
         </View>
@@ -143,7 +138,10 @@ export function RoutineNextCards({
           <Text variant="caption" muted className="mt-2">
             Next nap
           </Text>
-          <Text variant="caption" className="mt-0.5 text-center font-bold text-violet-800 dark:text-violet-200">
+          <Text
+            variant="caption"
+            className="mt-0.5 text-center font-bold text-violet-800 dark:text-violet-200"
+          >
             {shortTip(sleep)}
           </Text>
         </View>

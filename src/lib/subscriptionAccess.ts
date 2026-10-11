@@ -9,29 +9,20 @@ export interface FreemiumAccess {
   dailyLogLimit: number;
 }
 
-export function buildFreemiumAccess(
-  entitlement: SubscriptionEntitlement | null,
-): FreemiumAccess {
-  const hasPaidPremium =
-    entitlement != null && PREMIUM_STATUSES.includes(entitlement.status);
+export function buildFreemiumAccess(entitlement: SubscriptionEntitlement | null): FreemiumAccess {
+  const hasPaidPremium = entitlement != null && PREMIUM_STATUSES.includes(entitlement.status);
   const complimentaryUntil = entitlement?.complimentaryPremiumUntil;
   const isComplimentaryPremium =
-    !hasPaidPremium &&
-    complimentaryUntil != null &&
-    new Date(complimentaryUntil) > new Date();
+    !hasPaidPremium && complimentaryUntil != null && new Date(complimentaryUntil) > new Date();
   const isPremium = hasPaidPremium || isComplimentaryPremium;
   const isLimitedFree = !isPremium;
 
-  const dailyLogLimit = isPremium
-    ? Number.POSITIVE_INFINITY
-    : POST_TRIAL_DAILY_LOG_LIMIT;
+  const dailyLogLimit = isPremium ? Number.POSITIVE_INFINITY : POST_TRIAL_DAILY_LOG_LIMIT;
 
   return { isPremium, isLimitedFree, dailyLogLimit };
 }
 
-export function complimentaryDaysRemaining(
-  until: string | null | undefined,
-): number | null {
+export function complimentaryDaysRemaining(until: string | null | undefined): number | null {
   if (!until) return null;
   const end = new Date(until).getTime();
   const diff = end - Date.now();
